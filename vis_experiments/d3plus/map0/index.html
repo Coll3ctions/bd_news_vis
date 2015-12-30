@@ -21,14 +21,7 @@
   var visualization = d3plus.viz()
     .container("#viz")
     .type("geo_map")
-    .data(sample_data)
-    .coords("http://bl.ocks.org/davelandry/raw/9042807/countries.json")
-    .id("country")
-    .text("name")
-    .color({
-      "heatmap": [ "grey" , "purple" ],
-      "value": "value"
-    })
+    .coords("bd.json")
     .draw()
 
 </script>
