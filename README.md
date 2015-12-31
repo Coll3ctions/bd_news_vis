@@ -1,18 +1,18 @@
 bd_news_vis collaboration
 
 todo list
-- daily star crawled text (salman)\n
-- dhaka tribune crawled text (mishuk)\n
-- prothom alo english version crawled text (mishuk?)\n
-- NER tagging (khalid, script done)\n
-- d3plus visualization (saquib)\n
-- server space (saquib, done)\n
+- daily star crawled text (salman)
+- dhaka tribune crawled text (mishuk)
+- prothom alo english version crawled text (mishuk?)
+- NER tagging (khalid, script done)
+- d3plus visualization (saquib)
+- server space (saquib, done)
+- 
 
-issues
+issues (add more to keep track)
 - xpath parsing not returning 0 or null results (mishuk)
 - scrapy crawling not working with xpath (salman)
 - d3plus map not showing full region (saquib)
-- add more
 - 
 
 further ideas:
@@ -20,7 +20,6 @@ further ideas:
 - does climate change correlate with news trend?
 - policy making data available? any correlation with public memory decay rate?
 - network analysis between entities
-- add more
 - 
 
 Possible Journals: 
