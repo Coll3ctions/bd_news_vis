@@ -7,20 +7,17 @@ todo list
 - NER tagging (khalid, script done)
 - d3plus visualization (saquib)
 - server space (saquib, done)
-- 
 
 issues (add more to keep track)
 - xpath parsing not returning 0 or null results (mishuk)
 - scrapy crawling not working with xpath (salman)
 - d3plus map not showing full region (saquib)
-- 
 
 further ideas:
 - decay rate of public memory (characteristic rate for every country?)
 - does climate change correlate with news trend?
 - policy making data available? any correlation with public memory decay rate?
 - network analysis between entities
-- 
 
 Possible Journals: 
 - AEP
