@@ -1,0 +1,72 @@
+import scrapy
+
+from TheDailyStar_May_2003_Aug_2007.items import NewsVisItem
+from datetime import date, timedelta
+
+
+#'http://archive.thedailystar.net/2006/06/26/index.htm'
+
+
+class Spider1(scrapy.Spider):
+	name = "one"
+	allowed_domains = ["thedailystar.net"]
+
+	d1 = date(2003, 05, 26)
+	d2 = date(2003, 05, 28)
+
+	delta = d2 - d1
+	links = []
+	for i in range(delta.days + 1):
+		cdate = d1 + timedelta(days=i)
+		digits = (str(cdate)).split('-')
+		links.append("http://archive.thedailystar.net/" + digits[0] + '/' + digits[1] + '/' + digits[2] + '/index.htm')
+	
+	start_urls = links
+
+	def parse(self, response):
+		for href in response.css('a[class="mainheadlink2"]::attr("href")'):
+			url = response.urljoin(href.extract())
+			yield scrapy.Request(url, callback=self.parse_dir_contents)
+
+	def parse_dir_contents(self, response):
+		for sel in response.xpath('//div[@class="content"]'):
+			item = NewsVisItem()
+			item['headline'] = sel.xpath('//div[@class="panel-pane pane-views-panes pane-news-details-panel-pane-10 no-title block"]/div/h1/text()').extract()
+			item['link'] = response.url
+			item['tag'] = None
+			item['date'] = sel.xpath('//div[@class="panel-pane pane-views-panes pane-news-details-panel-pane-1 no-title block"]/div/div/text()').extract()[0].split('/')[0] 
+			item['lastModified'] = sel.xpath('//div[@class="panel-pane pane-views-panes pane-news-details-panel-pane-1 no-title block"]/div/div/text()').extract()[0].split('/')[1]
+
+########## Shitty code starts				
+			if len(sel.xpath('//div[contains(@class, "author-name")]/span')) == 0:
+				a = sel.xpath('//div[contains(@class, "author-name")]/span/a/text()').extract()
+				if len(a) > 0:
+					b = a[0].split(", ")
+					item['reporter'] = b[0]
+					if len(b) > 1:
+						item['location'] = b[1]
+					else:
+						item['location'] = None
+			else:
+				a = sel.xpath('//div[contains(@class, "author-name")]/span/text()').extract()
+				if len(a) > 0:
+					b = a[0].split(", ")
+					item['reporter'] = b[0]
+					if len(b) > 1:
+						item['location'] = b[1]
+					else:
+						item['location'] = None
+########## Shitty code ends
+
+			resp = [sel.xpath('//div[@class="field-body view-mode-teaser"]/p/text()').extract(),
+					sel.xpath('//div[@class="field-body view-mode-teaser"]/p/span/text()').extract(),
+					sel.xpath('//div[@class="field-body view-mode-teaser"]/div/p/text()').extract(),
+					sel.xpath('//div[@class="field-body view-mode-teaser"]/div/text()').extract()
+					]
+
+			for r in resp:
+				if len(r) != 0:
+					item['newsBody'] = r
+					break
+
+			yield item
