@@ -45,7 +45,6 @@ count = 0
 starting_page = 1
 ending_page = last_page_number + 1
 for current_page in range(starting_page, ending_page):
-	print "current_page ", current_page
 	paginated_news = requests.get('http://www.dhakatribune.com/bangladesh?page='+str(current_page))
 	tree_paginated_news = html.fromstring(paginated_news.content)
 	
@@ -82,6 +81,7 @@ for current_page in range(starting_page, ending_page):
 		news_reporters.append(rep)
 	print "news_reporter ", news_reporters
 	for i in range(len(news_links)):
+		print "current_page ", current_page
 		news_link = news_links[i]
 		if news_link == "http://www.dhakatribune.com/":
 			continue
