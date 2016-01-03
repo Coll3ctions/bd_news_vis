@@ -45,6 +45,7 @@ count = 0
 starting_page = 1
 ending_page = last_page_number + 1
 for current_page in range(starting_page, ending_page):
+	print "current_page ", current_page
 	paginated_news = requests.get('http://www.dhakatribune.com/bangladesh?page='+str(current_page))
 	tree_paginated_news = html.fromstring(paginated_news.content)
 	
@@ -118,10 +119,13 @@ for current_page in range(starting_page, ending_page):
 						news_location = district
 				print "news_location ", news_location
 
-		news = tree_news_page.xpath('//div[@class="span6 article-content"]')[0]
-		news_html = html.fromstring(tostring(news, 'utf-8', method="xml"))
-		news_text = news_html.text_content()
-		print "news_text ", news_text
+		news = tree_news_page.xpath('//div[@class="span6 article-content"]')
+		if len(news) < 1:
+			continue
+		else:
+			news_html = html.fromstring(tostring(news[0], 'utf-8', method="xml"))
+			news_text = news_html.text_content()
+			print "news_text ", news_text
 
 		##?? Could not Download the images, the images can not be opened after download
 		# ## downloading the related image using the news link
