@@ -1,12 +1,32 @@
 bd_news_vis collaboration
 
+Team Division
+- Saquib (analysis)
+- Khalid (analysis)
+- Mehrab (analysis)
+- Mishuk (web front-end and back-end)
+- Salman (web front end and back end)
+
 ### Todo list
 - daily star crawled text (salman)
+  - images to be downloaded
+  - tags to be machine learned
 - dhaka tribune crawled text (mishuk)
-- prothom alo english version crawled text (mishuk?)
+  - images to be downloaded
+- prothom alo english version crawled text (mishuk)
 - NER tagging (khalid, script done)
+  - interface with MongoDB 
 - d3plus visualization (saquib)
+  - improve on existing code from zeeshan
 - server space (saquib, done)
+  - AWS account for server space
+  - for now, mit.edu server. later AWS if needed.
+- Marketing
+  - prothom alo news
+  - facebook page
+  - after product launch
+- Brand name
+  - a group of data volunteers?
 
 ### Issues (add more to keep track)
 - ~~xpath parsing not returning 0 or null results (mishuk)~~
@@ -32,6 +52,10 @@ bd_news_vis collaboration
 - policy making data available? any correlation with public memory decay rate?
 - network analysis between entities
 - Fulfillment of promises by polittical leaders (maybe far fetched but still worth exploring)
+- comparing newspaper biases
+  - sentiment analysis can be augmented with frequency of bias terms
+- automatic crawler (mishuk and salman)
+- how to find a metric of transparency? control dataset?
 
 ### Possible Journals: 
 - AEP
