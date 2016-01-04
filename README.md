@@ -3,7 +3,7 @@ bd_news_vis collaboration
 Team Division
 - Saquib (analysis - distribution fitting, PCA, DTW)
 - Khalid (analysis - distribution fitting + tagging)
-- Mehrab (analysis)
+- Mehrab (analysis, data collection from other sources (weather shocks, climate, policies in heath and education))
 - Mishuk (back-end)
 - Salman (web front end and back end, ngram viewer)
 
