@@ -1,6 +1,6 @@
 bd_news_vis collaboration
 
-todo list
+### Todo list
 - daily star crawled text (salman)
 - dhaka tribune crawled text (mishuk)
 - prothom alo english version crawled text (mishuk?)
@@ -8,12 +8,12 @@ todo list
 - d3plus visualization (saquib)
 - server space (saquib, done)
 
-issues (add more to keep track)
+### Issues (add more to keep track)
 - ~~xpath parsing not returning 0 or null results (mishuk)~~
 - scrapy crawling not working with xpath (salman)
 - d3plus map not showing full region (saquib)
 
-### data analysis methods (ideas)
+### Data analysis methods (ideas)
 - PCA on entity-location matrix (locations are columns/dimensions)
 - DTW (dynamic time warping) on time series of popularity/attention of entities.
 - Devise a metric for popularity decay that takes account of
@@ -26,7 +26,7 @@ issues (add more to keep track)
   - This metric can take account of mutual information overlap between two newspapers based on an ensemble of entities and their relative coverage.
   - entity in this case may mean location or person.
 
-### further ideas:
+### Further ideas:
 - decay rate of public memory (characteristic rate for every country?)
 - does climate change correlate with news trend?
 - policy making data available? any correlation with public memory decay rate?
@@ -37,6 +37,7 @@ issues (add more to keep track)
 - APS
 - Arxiv
 
+### Result Dump
 URL for write up: https://www.sharelatex.com/project/548c9da8f76b211010f38142
 
 ### Mongo Data structure for the news:
