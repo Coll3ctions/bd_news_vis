@@ -1,10 +1,10 @@
 bd_news_vis collaboration
 
-Team Division
+### Team Division
 - Saquib (analysis - distribution fitting, PCA, DTW)
 - Khalid (analysis - distribution fitting + tagging)
 - Mehrab (analysis, data collection from other sources (weather shocks, climate, policies in heath and education))
-- Mishuk (back-end)
+- Mishuk (back-end, analysis)
 - Salman (web front end and back end, ngram viewer)
 
 ### Todo list
@@ -16,12 +16,14 @@ Team Division
 - prothom alo english version crawled text (mishuk)
 - NER tagging (khalid, script done)
   - interface with MongoDB 
-- d3plus visualization (saquib)
+- d3plus visualization (salman, saquib)
   - improve on existing code from zeeshan
-- server space (saquib, done)
+  - ngram viewer type interface
+  - network diagrams (show relationship between entities)
+- server space (saquib)
   - AWS account for server space
   - for now, mit.edu server. later AWS if needed.
-- Marketing
+- Marketing (everyone)
   - prothom alo news
   - facebook page
   - after product launch
