@@ -82,18 +82,23 @@ URL for write up: https://www.sharelatex.com/project/548c9da8f76b211010f38142
 ### Mongo Data structure for the news:
 
 - _id
+- newspaper_name: `String`
+- newspaper_url: `URL`
 - news_headline : `string`
 - news_original_tag : `string`
 - news_given_tag: `list`/`string` ?? Shouldn't we make it an array of tags? Let me know
 - news_reporter : `string`
 - news_date: `ISODate`
-- news_link: `url`
+- news_link: `URL`
 - news_text: `string` (I am keep it as an utf text with all the newlines and quotation marks)
 - news_location: `string` (This is a district name. To keep the district name same we can use the same `districts` list provided below. For dhaka tribune, all the dhaka news and national news are marked as "national", other wise tried to find the location whule crawling using thier tag. Still we have to find and verifiy the locations using NER tagging)
 - is_negative : `boolean`
+- news_image_urls : `list of URLs`
+- news_crawled_date: `ISODate`
+- news_keywords: `string`
 
 A python list of districts:
 
 ```
-districts = ["Barisal","Bagerhat","Bandarban","Barguna","Bhola","Brahmanbaria","Bogra","Chandpur","Chittagong","Chuadanga","Comilla","Coxs Bazar","Dhaka","Dinajpur","Feni","Faridpur","Gaibandha","Gazipur","Gopalganj","Habiganj","Jessore","Jhalakati","Jamalpur","Joypurhat","Jhenaidah","Kurigram","Khulna","Khagrachari","Kustia","Kishorganj","Laxmipur","Lalmonirhat","Madaripur","Magura","Meherpur","Moulvibazar","Mymensingh","Manikgonj","Munsiganj","Narail","Narayangonj","Noakhali","Naogaon","Narsingdi","Natore","Nawabgonj","Netrokona","Nilphamari","Pabna","Panchagarh","Patuakhali","Pirojpur","Rajshahi","Rajbari","Rangamati","Rangpur","Sylhet","Shariatpur","Satkhira","Sherpur","Sirajganj","Sunamgonj","Tangail","Thakurgaon"]
+districts = ["Barisal","Bagerhat","Bandarban","Barguna","Bhola","Brahmanbaria","Bogra","Chandpur","Chapainawabganj","Chittagong","Chuadanga","Comilla","Coxs Bazar","Dhaka","Dinajpur","Feni","Faridpur","Gaibandha","Gazipur","Gopalganj","Habiganj","Jessore","Jhalokati","Jamalpur","Joypurhat","Jhenaidah","Kurigram","Khulna","Khagrachhari","Kushtia","Kishoreganj","Lakshmipur","Lalmonirhat","Madaripur","Magura","Meherpur","Moulvibazar","Mymensingh","Manikganj","Munshiganj","Narail","Narayanganj","Noakhali","Naogaon","Narsingdi","Natore","Netrokona","Nilphamari","Pabna","Panchagarh","Patuakhali","Pirojpur","Rajshahi","Rajbari","Rangamati","Rangpur","Sylhet","Shariatpur","Satkhira","Sherpur","Sirajganj","Sunamgonj","Tangail","Thakurgaon"]
 ```
