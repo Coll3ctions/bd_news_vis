@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from lxml import html, etree
 import requests
 from pymongo import MongoClient
@@ -8,12 +9,6 @@ from xml.etree.ElementTree import Element, SubElement, Comment, tostring
 import urllib
 
 districts = ["Barisal","Bagerhat","Bandarban","Barguna","Bhola","Brahmanbaria","Bogra","Chandpur","Chittagong","Chuadanga","Comilla","Coxs Bazar","Dhaka","Dinajpur","Feni","Faridpur","Gaibandha","Gazipur","Gopalganj","Habiganj","Jessore","Jhalakati","Jamalpur","Joypurhat","Jhenaidah","Kurigram","Khulna","Khagrachari","Kustia","Kishorganj","Laxmipur","Lalmonirhat","Madaripur","Magura","Meherpur","Moulvibazar","Mymensingh","Manikgonj","Munsiganj","Narail","Narayangonj","Noakhali","Naogaon","Narsingdi","Natore","Nawabgonj","Netrokona","Nilphamari","Pabna","Panchagarh","Patuakhali","Pirojpur","Rajshahi","Rajbari","Rangamati","Rangpur","Sylhet","Shariatpur","Satkhira","Sherpur","Sirajganj","Sunamgonj","Tangail","Thakurgaon"]
-
-keyword_crime = ["rape","charge","murder","militant","kill","robber","gunfight","blast","torture","bomb","grenade","abduct","suicide","attacked","remand","autopsy","burn","behead","death","explosive","grenade","outlaw","protest","ringleader","body","gut","shibir","mug","jmb","beaten","sexual","harass","infight","yaba","drug","clash","warrant","lynch","held","dowry","confess","housewife","untraced","loot","chase","bullet","eyewitness","terrorist","disappearance","raid","firearm","shootout","suspect","arrest","acid","miscreant","sentenced","stab","altercation","weapon","severed","bust","threat","skirmish"]
-
-keyword_common_accident_crime = ["fire","injur","body","deceased","explod"]
-
-keyword_accident=["electrocute","rammed","collision","crash","accident","collapse","douse","plunge","drown","cylinder","crush","engulf","capsize","derail"]
 
 DOWNLOADED_IMAGE_PATH = "dhaka_tribune_images/"
 
@@ -45,6 +40,7 @@ count = 0
 starting_page = 1
 ending_page = last_page_number + 1
 for current_page in range(starting_page, ending_page):
+	print "current_page ", current_page
 	paginated_news = requests.get('http://www.dhakatribune.com/bangladesh?page='+str(current_page))
 	tree_paginated_news = html.fromstring(paginated_news.content)
 	
@@ -128,7 +124,11 @@ for current_page in range(starting_page, ending_page):
 			continue
 		else:
 			news_html = html.fromstring(tostring(news[0], 'utf-8', method="xml"))
-			news_text = news_html.text_content()
+			## Some strange unicode characters appear in the news text while crawling, I am removing them
+			u = u'Â'
+			u2 = u'â'
+			# print u
+			news_text = news_html.text_content().replace(u,"").replace(u2,"")
 			print "news_text ", news_text
 
 		##?? Could not Download the images, the images can not be opened after download
@@ -144,6 +144,14 @@ for current_page in range(starting_page, ending_page):
 		news_original_tag = news_orignal_tags[i].lower()
 		## is_negative inititated as true, when we can not find any negative keyword then it will be changed into false
 		is_negative = True
+		
+
+		keyword_crime = ["rape","charge","murder","militant","robber","gunfight","blast","torture","bomb","grenade","abduct","suicide","attacked","remand","autopsy","burn","behead","death","explosive","grenade","outlaw","protest","ringleader","body","gut","shibir","mug","jmb","beaten","sexual","harass","infight","yaba","drug","clash","warrant","lynch","held","dowry","confess","housewife","untraced","loot","chase","bullet","eyewitness","terrorist","disappearance","raid","firearm","shootout","suspect","arrest","acid","miscreant","sentenced","stab","altercation","weapon","severed","bust","threat","skirmish","crack"]
+
+		keyword_common_accident_crime = ["fire","injur","body","deceased","explod","kill"]
+
+		keyword_accident=["electrocut","ram","colli","crash","accident","collapse","douse","plunge","drown","cylinder","crush","engulf","capsize","derail"]
+
 		if news_original_tag.lower() == "crime":
 			news_given_tag = news_original_tag.lower()
 		else:
