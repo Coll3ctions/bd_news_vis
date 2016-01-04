@@ -13,13 +13,26 @@ issues (add more to keep track)
 - scrapy crawling not working with xpath (salman)
 - d3plus map not showing full region (saquib)
 
-further ideas:
+### data analysis methods (ideas)
+- PCA on entity-location matrix (locations are columns/dimensions)
+- DTW (dynamic time warping) on time series of popularity/attention of entities.
+- Devise a metric for popularity decay that takes account of
+  - width of waves (w_1, ..., w_n)
+  - period between waves (T_1, ..., T_(n-1))
+  - amplitude and/or area under the curve of a particular pulse (A_1, ..., A_n)
+  - Reward function for frequent show-ups of entities.
+  - We may need to sub-sample the time series to make the above quantities meaningful.
+- Come up with a metric for comparing newspapers (giving a formal structure to previous newspaper area coverage work)
+  - This metric can take account of mutual information overlap between two newspapers based on an ensemble of entities and their relative coverage.
+  - entity in this case may mean location or person.
+
+### further ideas:
 - decay rate of public memory (characteristic rate for every country?)
 - does climate change correlate with news trend?
 - policy making data available? any correlation with public memory decay rate?
 - network analysis between entities
 
-Possible Journals: 
+### Possible Journals: 
 - AEP
 - APS
 - Arxiv
