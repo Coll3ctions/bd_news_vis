@@ -1,11 +1,11 @@
 bd_news_vis collaboration
 
 Team Division
-- Saquib (analysis - distribution fitting)
-- Khalid (analysis - distribution fitting)
+- Saquib (analysis - distribution fitting, PCA, DTW)
+- Khalid (analysis - distribution fitting + tagging)
 - Mehrab (analysis)
-- Mishuk (web front-end and back-end)
-- Salman (web front end and back end)
+- Mishuk (back-end)
+- Salman (web front end and back end, ngram viewer)
 
 ### Todo list
 - daily star crawled text (salman)
@@ -65,6 +65,9 @@ Team Division
 - automatic crawler (mishuk and salman)
 - how to find a metric of transparency? control dataset?
 - can we use grammar analysis or regx parser or similar tools to understand road accident locations
+- investment opportunities based on location based news
+- news trend and correlation with economic growth
+- sentiment analysis and news mention can be analyzed to see if they have correlation with economic metrics.
 
 ### Possible Journals: 
 - AEP
