@@ -74,7 +74,11 @@ for current_page in range(starting_page, ending_page):
 		if len(gs) > 0:
 			#print "gs ", tostring(gs[0], 'utf-8', method="xml")
 			gss = html.fromstring(tostring(gs[0], 'utf-8', method="xml"))
-			rep = gss.xpath('//a/text()')[0]
+			rep = gss.xpath('//a/text()')
+			if len(rep) < 1:
+				rep = ""
+			else:
+				rep = rep[0]
 			#print rep[0]
 		else:
 			rep = ""
