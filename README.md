@@ -1,8 +1,8 @@
 bd_news_vis collaboration
 
 Team Division
-- Saquib (analysis)
-- Khalid (analysis)
+- Saquib (analysis - distribution fitting)
+- Khalid (analysis - distribution fitting)
 - Mehrab (analysis)
 - Mishuk (web front-end and back-end)
 - Salman (web front end and back end)
@@ -35,13 +35,21 @@ Team Division
 
 ### Data analysis methods (ideas)
 - PCA on entity-location matrix (locations are columns/dimensions)
+  - who is going where, are people following each other around (for elections)
+  - do MPs talk about their area in newspaper?
 - DTW (dynamic time warping) on time series of popularity/attention of entities.
+  - can we track 
 - Devise a metric for popularity decay that takes account of
   - width of waves (w_1, ..., w_n)
   - period between waves (T_1, ..., T_(n-1))
   - amplitude and/or area under the curve of a particular pulse (A_1, ..., A_n)
   - Reward function for frequent show-ups of entities.
   - We may need to sub-sample the time series to make the above quantities meaningful.
+- Gaussian Distribution (a standard one for khaleda or hasina). 
+- What is the functional shape that describes a newspaper memory. (sum of a few functions that can generalize to any entity news).
+  - we can try to fit a power law by binning time. See if newspapers have similar exponents
+  - say, a weibull distribution describes rare events. then we can express it as a sum of the same distribution for popular entities.
+- rank distribution (sigmoid function) (bursty-ness)
 - Come up with a metric for comparing newspapers (giving a formal structure to previous newspaper area coverage work)
   - This metric can take account of mutual information overlap between two newspapers based on an ensemble of entities and their relative coverage.
   - entity in this case may mean location or person.
@@ -56,6 +64,7 @@ Team Division
   - sentiment analysis can be augmented with frequency of bias terms
 - automatic crawler (mishuk and salman)
 - how to find a metric of transparency? control dataset?
+- can we use grammar analysis or regx parser or similar tools to understand road accident locations
 
 ### Possible Journals: 
 - AEP
