@@ -31,6 +31,7 @@ bd_news_vis collaboration
 - does climate change correlate with news trend?
 - policy making data available? any correlation with public memory decay rate?
 - network analysis between entities
+- Fulfillment of promises by polittical leaders (maybe far fetched but still worth exploring)
 
 ### Possible Journals: 
 - AEP
