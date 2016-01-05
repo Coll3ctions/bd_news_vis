@@ -82,6 +82,10 @@ URL for write up: https://www.sharelatex.com/project/548c9da8f76b211010f38142
 ### To run the crawler
 `pip install newspaper pymongo`
 
+Installing Stanford NER Tagger:
+
+http://stackoverflow.com/questions/13883277/stanford-parser-and-nltk/34112695#34112695
+
 ### Mongo Data structure for the news:
 
 - _id
