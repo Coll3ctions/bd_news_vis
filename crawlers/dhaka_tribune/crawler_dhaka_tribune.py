@@ -7,28 +7,87 @@ from dateutil import parser
 import time
 from xml.etree.ElementTree import Element, SubElement, Comment, tostring
 import urllib
+import os
+from nltk.tag import StanfordNERTagger
+from nltk import pos_tag
+from nltk.chunk import conlltags2tree
+from nltk.tree import Tree
+from newspaper import Article
+import datetime
 
-districts = ["Barisal","Bagerhat","Bandarban","Barguna","Bhola","Brahmanbaria","Bogra","Chandpur","Chittagong","Chuadanga","Comilla","Coxs Bazar","Dhaka","Dinajpur","Feni","Faridpur","Gaibandha","Gazipur","Gopalganj","Habiganj","Jessore","Jhalakati","Jamalpur","Joypurhat","Jhenaidah","Kurigram","Khulna","Khagrachari","Kustia","Kishorganj","Laxmipur","Lalmonirhat","Madaripur","Magura","Meherpur","Moulvibazar","Mymensingh","Manikgonj","Munsiganj","Narail","Narayangonj","Noakhali","Naogaon","Narsingdi","Natore","Nawabgonj","Netrokona","Nilphamari","Pabna","Panchagarh","Patuakhali","Pirojpur","Rajshahi","Rajbari","Rangamati","Rangpur","Sylhet","Shariatpur","Satkhira","Sherpur","Sirajganj","Sunamgonj","Tangail","Thakurgaon"]
+districts = ["Barisal","Bagerhat","Bandarban","Barguna","Bhola","Brahmanbaria","Bogra","Chandpur","Chapainawabganj","Chittagong","Chuadanga","Comilla","Coxs Bazar","Dhaka","Dinajpur","Feni","Faridpur","Gaibandha","Gazipur","Gopalganj","Habiganj","Jessore","Jhalokati","Jamalpur","Joypurhat","Jhenaidah","Kurigram","Khulna","Khagrachhari","Kushtia","Kishoreganj","Lakshmipur","Lalmonirhat","Madaripur","Magura","Meherpur","Moulvibazar","Mymensingh","Manikganj","Munshiganj","Narail","Narayanganj","Noakhali","Naogaon","Narsingdi","Natore","Netrokona","Nilphamari","Pabna","Panchagarh","Patuakhali","Pirojpur","Rajshahi","Rajbari","Rangamati","Rangpur","Sylhet","Shariatpur","Satkhira","Sherpur","Sirajganj","Sunamgonj","Tangail","Thakurgaon"]
 
 DOWNLOADED_IMAGE_PATH = "dhaka_tribune_images/"
 
 def download_photo(img_url, filename):
-    file_path = "%s%s" % (DOWNLOADED_IMAGE_PATH, filename)
-    downloaded_image = file(file_path, "wb")
+	file_path = "%s%s" % (DOWNLOADED_IMAGE_PATH, filename)
+	downloaded_image = file(file_path, "wb")
 
-    image_on_web = urllib.urlopen(img_url)
-    while True:
-        buf = image_on_web.read(65536)
-        if len(buf) == 0:
-            break
-        downloaded_image.write(buf)
-    downloaded_image.close()
-    image_on_web.close()
+	image_on_web = urllib.urlopen(img_url)
+	while True:
+		buf = image_on_web.read(65536)
+		if len(buf) == 0:
+			break
+		downloaded_image.write(buf)
+	downloaded_image.close()
+	image_on_web.close()
 
 ## Load mongodb
 client = MongoClient("mongodb://localhost:27017/")
 db = client.bd_news
-dhaka_tribunes = db.dhaka_tribunes
+bd_news_articles = db.bd_news_articles
+
+## Setting up Stanfor NER Tagger 
+## using these instructions: http://stackoverflow.com/questions/13883277/stanford-parser-and-nltk/34112695#34112695
+stanford_ner_path = os.path.abspath(os.path.join(os.path.dirname( __file__ ), '../..', 'stanford_ner_classifiers'))
+st = StanfordNERTagger("english.muc.7class.distsim.crf.ser.gz") 
+
+## Now creating a function for tidying the entities
+## using this resource: http://stackoverflow.com/questions/30664677/extract-list-of-persons-and-organizations-using-stanford-ner-tagger-in-nltk?answertab=votes#tab-top
+def stanfordNE2BIO(tagged_sent):
+	bio_tagged_sent = []
+	prev_tag = "O"
+	for token, tag in tagged_sent:
+		if tag == "O": #O
+			bio_tagged_sent.append((token, tag))
+			prev_tag = tag
+			continue
+		if tag != "O" and prev_tag == "O": # Begin NE
+			bio_tagged_sent.append((token, "B-"+tag))
+			prev_tag = tag
+		elif prev_tag != "O" and prev_tag == tag: # Inside NE
+			bio_tagged_sent.append((token, "I-"+tag))
+			prev_tag = tag
+		elif prev_tag != "O" and prev_tag != tag: # Adjacent NE
+			bio_tagged_sent.append((token, "B-"+tag))
+			prev_tag = tag
+
+	return bio_tagged_sent
+
+def stanfordNE2tree(ne_tagged_sent):
+	bio_tagged_sent = stanfordNE2BIO(ne_tagged_sent)
+	sent_tokens, sent_ne_tags = zip(*bio_tagged_sent)
+	sent_pos_tags = [pos for token, pos in pos_tag(sent_tokens)]
+
+	sent_conlltags = [(token, pos, ne) for token, pos, ne in zip(sent_tokens, sent_pos_tags, sent_ne_tags)]
+	ne_tree = conlltags2tree(sent_conlltags)
+	return ne_tree
+
+def create_ner_entities_tuple(text):
+	ne_tagged_sent = st.tag(text.split())
+	ne_tree = stanfordNE2tree(ne_tagged_sent)
+	ne_in_sent = []
+	for subtree in ne_tree:
+		if type(subtree) == Tree: # If subtree is a noun chunk, i.e. NE != "O"
+			ne_label = subtree.label()
+			ne_string = " ".join([token for token, pos in subtree.leaves()])
+			ne_in_sent.append((ne_string, ne_label))
+	return ne_in_sent
+
+## Here starts the actual crawling for Dhaka Tribune
+newspaper_name = "Dhaka Tribune"
+newspaper_url = "http://www.dhakatribune.com"
+
 
 ## Getting the total number of pages in the pagination form the first page using the last page number in the pagination
 first_page = requests.get('http://www.dhakatribune.com/bangladesh')
@@ -39,6 +98,8 @@ count = 0
 ##?? Solve the first page
 starting_page = 1
 ending_page = last_page_number + 1
+circuit_breaker = False
+## Crawling through each paginated pages to collect the individual news article links
 for current_page in range(starting_page, ending_page):
 	print "current_page ", current_page
 	paginated_news = requests.get('http://www.dhakatribune.com/bangladesh?page='+str(current_page))
@@ -80,13 +141,22 @@ for current_page in range(starting_page, ending_page):
 			rep = ""
 		news_reporters.append(rep)
 	print "news_reporter ", news_reporters
+
+	## Now crawling through each individual news article of a distinct paginatated top lavel pages
 	for i in range(len(news_links)):
-		print "current_page ", current_page
+		print
+		print
 		news_link = news_links[i]
 		if news_link == "http://www.dhakatribune.com/":
 			continue
+		#### if statement to find if the news article is already in the mongodb database, if it is already there, then the crawler will stop rightaway
+		isDeletedUser = bd_news_articles.find_one({"news_link":news_link})
+		if isDeletedUser:
+			circuit_breaker = True
+			break
 		print "news_link ", news_link
 		news_page = requests.get(news_link)
+		news_crawled_date = datetime.datetime.now()
 		tree_news_page = html.fromstring(news_page.content)
 		news_date = news_dates[i][2:]
 		news_date = parser.parse(news_date)
@@ -114,26 +184,15 @@ for current_page in range(starting_page, ending_page):
 				print "news_reporter ", news_reporter
 				for district in districts:
 					ratio = SequenceMatcher(None, news_location.lower(), district.lower()).ratio()
-					## ratio = SequenceMatcher(None, "Coxs Bazar", "Cox\xc3\xa2\xc2\x80\xc2\x99s Bazar").ratio() = 0.769
 					if ratio > 0.75:
 						news_location = district
+					## reason for it to be 0.75 
+					## ratio = SequenceMatcher(None, "Coxs Bazar", "Cox\xc3\xa2\xc2\x80\xc2\x99s Bazar").ratio() = 0.769
 				print "news_location ", news_location
-
-		news = tree_news_page.xpath('//div[@class="span6 article-content"]')
-		if len(news) < 1:
-			continue
-		else:
-			news_html = html.fromstring(tostring(news[0], 'utf-8', method="xml"))
-			## Some strange unicode characters appear in the news text while crawling, I am removing them
-			u = u'Â'
-			u2 = u'â'
-			# print u
-			news_text = news_html.text_content().replace(u,"").replace(u2,"")
-			print "news_text ", news_text
 
 		##?? Could not Download the images, the images can not be opened after download
 		# ## downloading the related image using the news link
-		# news_image_link = news_image_links[i]
+		news_image_link = news_image_links[i]
 		# news_image_link = "http://www.dhakatribune.com"+news_image_link
 		# news_image_filename = news_date.strftime('%Y-%m-%d')+news_headline.replace(" ","-")+".jpg"
 		# news_image_filename.replace(",","")
@@ -145,6 +204,15 @@ for current_page in range(starting_page, ending_page):
 		## is_negative inititated as true, when we can not find any negative keyword then it will be changed into false
 		is_negative = True
 		
+		## Using python's newspaper module to extract the news text and some very basic keywords
+		article = Article(news_link)
+		article.download()
+		article.parse()
+		article.nlp()
+		news_keywords = article.keywords
+		print "Article keywords ", news_keywords
+		news_text = article.text
+		print "news_text ",news_text
 
 		keyword_crime = ["rape","charge","murder","militant","robber","gunfight","blast","torture","bomb","grenade","abduct","suicide","attacked","remand","autopsy","burn","behead","death","explosive","grenade","outlaw","protest","ringleader","body","gut","shibir","mug","jmb","beaten","sexual","harass","infight","yaba","drug","clash","warrant","lynch","held","dowry","confess","housewife","untraced","loot","chase","bullet","eyewitness","terrorist","disappearance","raid","firearm","shootout","suspect","arrest","acid","miscreant","sentenced","stab","altercation","weapon","severed","bust","threat","skirmish","crack"]
 
@@ -173,24 +241,77 @@ for current_page in range(starting_page, ending_page):
 		print "news_original_tag ", news_original_tag
 		print "is_negative ",is_negative
 		print "news_given_tag ", news_given_tag
+
+		## Now using Stanford's NER tagger to identify 7 different type of objects in the news article
+		ner_7_class =  create_ner_entities_tuple(news_text)
+		#print ner_7_class
+		news_ner_tags = {}
+		ner_person = []
+		ner_location = []
+		ner_organization = []
+		ner_date = []
+		ner_money = []
+		ner_percent = []
+		ner_time = []
+		for entity in ner_7_class:
+			if entity[1] == "PERSON":
+				ner_person.append(entity[0])
+			elif entity[1] == "LOCATION":
+				ner_location.append(entity[0])
+			elif entity[1] == "ORGANIZATION":
+				ner_organization.append(entity[0])
+			elif entity[1] == "DATE":
+				ner_date.append(entity[0])
+			elif entity[1] == "MONEY":
+				ner_money.append(entity[0])
+			elif entity[1] == "PERCENT":
+				ner_percent.append(entity[0])
+			elif entity[1] == "TIME":
+				ner_time.append(entity[0])
+		news_ner_tags['persons'] = ner_person
+		news_ner_tags['locations'] = ner_location
+		news_ner_tags['organizations'] = ner_organization
+		news_ner_tags['dates'] = ner_date
+		news_ner_tags['moneys'] = ner_money
+		news_ner_tags['percents'] = ner_percent
+		news_ner_tags['times'] = ner_time
+
+		news_ner_tags['persons_unique'] = list(set(ner_person))
+		news_ner_tags['locations_unique'] = list(set(ner_location))
+		news_ner_tags['organizations_unique'] = list(set(ner_organization))
+		news_ner_tags['dates_unique'] = list(set(ner_date))
+		news_ner_tags['moneys_unique'] = list(set(ner_money))
+		news_ner_tags['percents_unique'] = list(set(ner_percent))
+		news_ner_tags['times_unique'] = list(set(ner_time))
+		print news_ner_tags
 		
 		doc = {}
-		doc["news_date"] = news_date
-		doc["news_link"] = news_link
+		doc["newspaper_name"] = newspaper_name
+		doc["newspaper_url"] = newspaper_url
 		doc["news_headline"] = news_headline
+		doc["news_publish_date"] = news_date
+		doc["news_url"] = news_link
+		doc["news_original_tags"] = list([news_original_tag])
+		doc["news_naive_tags"] = list([news_given_tag])
+		doc["news_ml_tags"] = None
 		doc["news_reporter"] = news_reporter
 		doc["news_location"] = news_location
 		doc["news_text"] = news_text
-		doc["news_original_tag"] = news_original_tag
-		doc["news_given_tag"] = news_given_tag
 		doc["is_negative"] = is_negative
 		##?? Could not manage to download the images properly
 		## Keeping the news image link an array as there can be multiple images in a news in future
-		#doc["news_image_links"] = list([news_image_link])
+		doc["news_image_urls"] = list([news_image_link])
 		#doc["news_image_filename"] = news_image_filename
-		current_mongo_insert_id = dhaka_tribunes.insert_one(doc).inserted_id 
+		doc["news_crawled_date"] = news_crawled_date
+		doc["news_keywords"] = news_keywords
+		doc["news_ner_tags"] = news_ner_tags
+		current_mongo_insert_id = bd_news_articles.insert_one(doc).inserted_id
+		print "inserted ", news_link, " as ", current_mongo_insert_id
 		count += 1
+		print "Current page ", current_page
 		print "Current News Count ", count
 		#time.sleep(1)
+	if circuit_breaker == True:
+		break
 
 # ## Double key word = [["shot","dead"],["body","found","recover"],["death","threat"]]
