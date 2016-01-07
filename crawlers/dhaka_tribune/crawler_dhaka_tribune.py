@@ -23,7 +23,7 @@ last_page_number = int(tree_first_page.xpath('//li[@class="pager-last last"]//a/
 ## Parameters of the crawler
 count = 0
 ## I am never taking the 0th page, because those would be the part of the cron jobs of some the next date
-starting_page = 6
+starting_page = 1000
 ending_page = last_page_number + 1
 circuit_breaker = False
 
@@ -272,23 +272,56 @@ for current_page in range(starting_page, ending_page):
 		ner_money = []
 		ner_percent = []
 		ner_time = []
-		if not news_text == "":
-			ner_7_class =  create_ner_entities_tuple(news_text)
-			for entity in ner_7_class:
-				if entity[1] == "PERSON":
-					ner_person.append(entity[0])
-				elif entity[1] == "LOCATION":
-					ner_location.append(entity[0])
-				elif entity[1] == "ORGANIZATION":
-					ner_organization.append(entity[0])
-				elif entity[1] == "DATE":
-					ner_date.append(entity[0])
-				elif entity[1] == "MONEY":
-					ner_money.append(entity[0])
-				elif entity[1] == "PERCENT":
-					ner_percent.append(entity[0])
-				elif entity[1] == "TIME":
-					ner_time.append(entity[0])
+		try:
+			if not news_text == "":
+				ner_7_class =  create_ner_entities_tuple(news_text)
+				for entity in ner_7_class:
+					if entity[1] == "PERSON":
+						ner_person.append(entity[0])
+					elif entity[1] == "LOCATION":
+						ner_location.append(entity[0])
+					elif entity[1] == "ORGANIZATION":
+						ner_organization.append(entity[0])
+					elif entity[1] == "DATE":
+						ner_date.append(entity[0])
+					elif entity[1] == "MONEY":
+						ner_money.append(entity[0])
+					elif entity[1] == "PERCENT":
+						ner_percent.append(entity[0])
+					elif entity[1] == "TIME":
+						ner_time.append(entity[0])
+				news_ner_tags['persons'] = ner_person
+				news_ner_tags['locations'] = ner_location
+				news_ner_tags['organizations'] = ner_organization
+				news_ner_tags['dates'] = ner_date
+				news_ner_tags['moneys'] = ner_money
+				news_ner_tags['percents'] = ner_percent
+				news_ner_tags['times'] = ner_time
+
+				news_ner_tags['persons_unique'] = list(set(ner_person))
+				news_ner_tags['locations_unique'] = list(set(ner_location))
+				news_ner_tags['organizations_unique'] = list(set(ner_organization))
+				news_ner_tags['dates_unique'] = list(set(ner_date))
+				news_ner_tags['moneys_unique'] = list(set(ner_money))
+				news_ner_tags['percents_unique'] = list(set(ner_percent))
+				news_ner_tags['times_unique'] = list(set(ner_time))
+			else:
+				news_ner_tags['persons'] = ner_person
+				news_ner_tags['locations'] = ner_location
+				news_ner_tags['organizations'] = ner_organization
+				news_ner_tags['dates'] = ner_date
+				news_ner_tags['moneys'] = ner_money
+				news_ner_tags['percents'] = ner_percent
+				news_ner_tags['times'] = ner_time
+
+				news_ner_tags['persons_unique'] = list(set(ner_person))
+				news_ner_tags['locations_unique'] = list(set(ner_location))
+				news_ner_tags['organizations_unique'] = list(set(ner_organization))
+				news_ner_tags['dates_unique'] = list(set(ner_date))
+				news_ner_tags['moneys_unique'] = list(set(ner_money))
+				news_ner_tags['percents_unique'] = list(set(ner_percent))
+				news_ner_tags['times_unique'] = list(set(ner_time))
+		except:
 			news_ner_tags['persons'] = ner_person
 			news_ner_tags['locations'] = ner_location
 			news_ner_tags['organizations'] = ner_organization
@@ -304,22 +337,8 @@ for current_page in range(starting_page, ending_page):
 			news_ner_tags['moneys_unique'] = list(set(ner_money))
 			news_ner_tags['percents_unique'] = list(set(ner_percent))
 			news_ner_tags['times_unique'] = list(set(ner_time))
-		else:
-			news_ner_tags['persons'] = ner_person
-			news_ner_tags['locations'] = ner_location
-			news_ner_tags['organizations'] = ner_organization
-			news_ner_tags['dates'] = ner_date
-			news_ner_tags['moneys'] = ner_money
-			news_ner_tags['percents'] = ner_percent
-			news_ner_tags['times'] = ner_time
+			print "It was an exception for NER tagger"
 
-			news_ner_tags['persons_unique'] = list(set(ner_person))
-			news_ner_tags['locations_unique'] = list(set(ner_location))
-			news_ner_tags['organizations_unique'] = list(set(ner_organization))
-			news_ner_tags['dates_unique'] = list(set(ner_date))
-			news_ner_tags['moneys_unique'] = list(set(ner_money))
-			news_ner_tags['percents_unique'] = list(set(ner_percent))
-			news_ner_tags['times_unique'] = list(set(ner_time))
 		print news_ner_tags
 		
 		doc = {}
