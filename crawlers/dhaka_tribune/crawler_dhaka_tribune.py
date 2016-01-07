@@ -15,6 +15,22 @@ from nltk.tree import Tree
 from newspaper import Article
 import datetime
 
+## Getting the total number of pages in the pagination form the first page using the last page number in the pagination
+first_page = requests.get('http://www.dhakatribune.com/bangladesh')
+tree_first_page = html.fromstring(first_page.content)
+last_page_number = int(tree_first_page.xpath('//li[@class="pager-last last"]//a/@href')[0].split('=')[1])
+
+## Parameters of the crawler
+count = 0
+## I am never taking the 0th page, because those would be the part of the cron jobs of some the next date
+starting_page = 1
+ending_page = last_page_number + 1
+circuit_breaker = False
+
+## Here starts the actual crawling for Dhaka Tribune
+newspaper_name = "Dhaka Tribune"
+newspaper_url = "http://www.dhakatribune.com"
+
 districts = ["Barisal","Bagerhat","Bandarban","Barguna","Bhola","Brahmanbaria","Bogra","Chandpur","Chapainawabganj","Chittagong","Chuadanga","Comilla","Coxs Bazar","Dhaka","Dinajpur","Feni","Faridpur","Gaibandha","Gazipur","Gopalganj","Habiganj","Jessore","Jhalokati","Jamalpur","Joypurhat","Jhenaidah","Kurigram","Khulna","Khagrachhari","Kushtia","Kishoreganj","Lakshmipur","Lalmonirhat","Madaripur","Magura","Meherpur","Moulvibazar","Mymensingh","Manikganj","Munshiganj","Narail","Narayanganj","Noakhali","Naogaon","Narsingdi","Natore","Netrokona","Nilphamari","Pabna","Panchagarh","Patuakhali","Pirojpur","Rajshahi","Rajbari","Rangamati","Rangpur","Sylhet","Shariatpur","Satkhira","Sherpur","Sirajganj","Sunamgonj","Tangail","Thakurgaon"]
 
 DOWNLOADED_IMAGE_PATH = "dhaka_tribune_images/"
@@ -84,21 +100,6 @@ def create_ner_entities_tuple(text):
 			ne_in_sent.append((ne_string, ne_label))
 	return ne_in_sent
 
-## Here starts the actual crawling for Dhaka Tribune
-newspaper_name = "Dhaka Tribune"
-newspaper_url = "http://www.dhakatribune.com"
-
-
-## Getting the total number of pages in the pagination form the first page using the last page number in the pagination
-first_page = requests.get('http://www.dhakatribune.com/bangladesh')
-tree_first_page = html.fromstring(first_page.content)
-last_page_number = int(tree_first_page.xpath('//li[@class="pager-last last"]//a/@href')[0].split('=')[1])
-
-count = 0
-##?? Solve the first page
-starting_page = 1
-ending_page = last_page_number + 1
-circuit_breaker = False
 ## Crawling through each paginated pages to collect the individual news article links
 for current_page in range(starting_page, ending_page):
 	print "current_page ", current_page
@@ -146,11 +147,13 @@ for current_page in range(starting_page, ending_page):
 	for i in range(len(news_links)):
 		print
 		print
+		print "current page ", current_page
+		print "position of this news ", i+1
 		news_link = news_links[i]
 		if news_link == "http://www.dhakatribune.com/":
 			continue
 		#### if statement to find if the news article is already in the mongodb database, if it is already there, then the crawler will stop rightaway
-		isDeletedUser = bd_news_articles.find_one({"news_link":news_link})
+		isDeletedUser = bd_news_articles.find_one({"news_url":news_link})
 		if isDeletedUser:
 			circuit_breaker = True
 			break
@@ -189,6 +192,18 @@ for current_page in range(starting_page, ending_page):
 					## reason for it to be 0.75 
 					## ratio = SequenceMatcher(None, "Coxs Bazar", "Cox\xc3\xa2\xc2\x80\xc2\x99s Bazar").ratio() = 0.769
 				print "news_location ", news_location
+		
+		news = tree_news_page.xpath('//div[@class="span6 article-content"]')
+ 		if len(news) < 1:
+ 			continue
+ 		else:
+ 			news_html = html.fromstring(tostring(news[0], 'utf-8', method="xml"))
+ 			## Some strange unicode characters appear in the news text while crawling, I am removing them
+ 			u = u'Â'
+ 			u2 = u'â'
+ 			# print u
+ 			news_text = news_html.text_content().replace(u,"").replace(u2,"")
+ 			print "news_text ", news_text
 
 		##?? Could not Download the images, the images can not be opened after download
 		# ## downloading the related image using the news link
@@ -211,8 +226,8 @@ for current_page in range(starting_page, ending_page):
 		article.nlp()
 		news_keywords = article.keywords
 		print "Article keywords ", news_keywords
-		news_text = article.text
-		print "news_text ",news_text
+		article_text = article.text
+		print "article_text ",article_text
 
 		keyword_crime = ["rape","charge","murder","militant","robber","gunfight","blast","torture","bomb","grenade","abduct","suicide","attacked","remand","autopsy","burn","behead","death","explosive","grenade","outlaw","protest","ringleader","body","gut","shibir","mug","jmb","beaten","sexual","harass","infight","yaba","drug","clash","warrant","lynch","held","dowry","confess","housewife","untraced","loot","chase","bullet","eyewitness","terrorist","disappearance","raid","firearm","shootout","suspect","arrest","acid","miscreant","sentenced","stab","altercation","weapon","severed","bust","threat","skirmish","crack"]
 
@@ -309,7 +324,7 @@ for current_page in range(starting_page, ending_page):
 		print "inserted ", news_link, " as ", current_mongo_insert_id
 		count += 1
 		print "Current page ", current_page
-		print "Current News Count ", count
+		print "total news inserted ", count
 		#time.sleep(1)
 	if circuit_breaker == True:
 		break
