@@ -23,7 +23,7 @@ last_page_number = int(tree_first_page.xpath('//li[@class="pager-last last"]//a/
 ## Parameters of the crawler
 count = 0
 ## I am never taking the 0th page, because those would be the part of the cron jobs of some the next date
-starting_page = 31
+starting_page = 1
 ending_page = last_page_number + 1
 circuit_breaker = False
 
