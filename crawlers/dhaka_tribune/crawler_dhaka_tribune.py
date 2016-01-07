@@ -23,7 +23,7 @@ last_page_number = int(tree_first_page.xpath('//li[@class="pager-last last"]//a/
 ## Parameters of the crawler
 count = 0
 ## I am never taking the 0th page, because those would be the part of the cron jobs of some the next date
-starting_page = 1
+starting_page = 31
 ending_page = last_page_number + 1
 circuit_breaker = False
 
@@ -227,13 +227,18 @@ for current_page in range(starting_page, ending_page):
 		is_negative = True
 		
 		## Using python's newspaper module to extract the news text and some very basic keywords
-		article = Article(news_link)
-		article.download()
-		article.parse()
-		article.nlp()
-		news_keywords = article.keywords
-		print "Article keywords ", news_keywords
-		article_text = article.text
+		try:
+			article = Article(news_link)
+			article.download()
+			article.parse()
+			article.nlp()
+			news_keywords = article.keywords
+			print "Article keywords ", news_keywords
+			article_text = article.text
+		except:
+			article_text = ""
+			news_keywords = []
+			print "newspaper.Article Exception"
 		print "article_text \n",article_text
 		if article_text and article_text.strip():
 			news_text = article_text
