@@ -90,6 +90,11 @@ Installing Stanford NER Tagger:
 
 http://stackoverflow.com/questions/13883277/stanford-parser-and-nltk/34112695#34112695
 
+#### Points to be noted for Stanford NER tagger:
+- Sometimes it confuses one single entity into multiple entities, e.g. "Lt Colonel Shahidur Rahman", "Shahidur Rahman", "Shahidur" are recognized as different entities
+- It mixes up the organizations and persons frequently
+- So far I haven't seen to it to identify the Taka amounts as money in any article
+
 ### Mongo Data structure for the news:
 
 - _id : `ObjectID`
