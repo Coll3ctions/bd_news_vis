@@ -96,19 +96,20 @@ http://stackoverflow.com/questions/13883277/stanford-parser-and-nltk/34112695#34
 - newspaper_name: `String` e.g. "Dhaka Tribune", "The Daily Star"
 - newspaper_url: `URL` e.g. "http://www.thedailystar.net"
 - news_headline : `String` e.g. "They all care about democracy"
-- news_original_tags : `list of Lowercase String` e.g. "bangladesh"
-- news_naive_tag: `list of Lowercase Strings` e.g. \["crime"\]
-- news_ml_tags : `list of Strings` e.g. \["violence", "domestic", "crime"\]
-- news_reporter : `String` e.g. "Captain Bangladesh"
 - news_publish_date: `ISODate`
 - news_url: `URL` e.g. "http://www.thedailystar.net/frontpage/they-all-care-about-democracy-197176"
-- news_text: `String` (I am keeping it as an utf text with all the newlines and quotation marks)
+- news_original_tags : `list of Lowercase String` e.g. "bangladesh"
+- news_naive_tags: `list of Lowercase Strings` e.g. \["crime"\]
+- news_ml_tags : `list of Strings` e.g. \["violence", "domestic", "crime"\]
+- news_reporter : `String` e.g. "Captain Bangladesh"
 - news_location: `String` e.g. "Narail" (This is a district name. To keep the district name same we can use the same `districts` list provided below. For dhaka tribune, all the dhaka news and national news are marked as "national", other wise tried to find the location whule crawling using thier tag. Still we have to find and verifiy the locations using NER tagging)
+- news_text: `String` (I am keeping it as an utf text with all the newlines and quotation marks)
 - is_negative : `boolean`
 - news_image_urls : `list of URLs`
 - news_crawled_date: `ISODate`
 - news_keywords: `list of String`
-- news_ner_tags: {location:\[list of string\], person:\[list of string\], organization:\[list of string\], money:\[list of amounts\], percent:\[list of percents\], date:\[list of dates\], time:\[list of times\]
+- news_ner_tags: {locations:\[list of string\], persons:\[list of string\], organizations:\[list of string\], moneys:\[list of amounts\], percents:\[list of percents\], dates:\[list of dates\], times:\[list of times\],locations_unique:\[list of string\], persons_unique:\[list of string\], organizations_unique:\[list of string\], moneys_unique:\[list of amounts\], percents_unique:\[list of percents\], dates_unique:\[list of dates\], times_unique:\[list of times\]
+
 }
 
 A python list of districts:
