@@ -82,22 +82,26 @@ URL for write up: https://www.sharelatex.com/project/548c9da8f76b211010f38142
 ### To run the crawler
 `pip install newspaper pymongo`
 
+Usage of newspaper module of python:
+
+https://pypi.python.org/pypi/newspaper
+
 Installing Stanford NER Tagger:
 
 http://stackoverflow.com/questions/13883277/stanford-parser-and-nltk/34112695#34112695
 
 ### Mongo Data structure for the news:
 
-- _id
+- _id : `ObjectID`
 - newspaper_name: `String` e.g. "Dhaka Tribune", "The Daily Star"
 - newspaper_url: `URL` e.g. "http://www.thedailystar.net"
 - news_headline : `String` e.g. "They all care about democracy"
-- news_original_tag : `Lowercase String` e.g. "bangladesh"
-- news_naive_tag: `list of String` e.g. \["crime"\]
-- news_ml_tags : `list of String` e.g. \["violence", "domestic", "crime"\]
+- news_original_tags : `list of Lowercase String` e.g. "bangladesh"
+- news_naive_tag: `list of Lowercase Strings` e.g. \["crime"\]
+- news_ml_tags : `list of Strings` e.g. \["violence", "domestic", "crime"\]
 - news_reporter : `String` e.g. "Captain Bangladesh"
 - news_publish_date: `ISODate`
-- news_link: `URL` e.g. "http://www.thedailystar.net/frontpage/they-all-care-about-democracy-197176"
+- news_url: `URL` e.g. "http://www.thedailystar.net/frontpage/they-all-care-about-democracy-197176"
 - news_text: `String` (I am keeping it as an utf text with all the newlines and quotation marks)
 - news_location: `String` e.g. "Narail" (This is a district name. To keep the district name same we can use the same `districts` list provided below. For dhaka tribune, all the dhaka news and national news are marked as "national", other wise tried to find the location whule crawling using thier tag. Still we have to find and verifiy the locations using NER tagging)
 - is_negative : `boolean`
