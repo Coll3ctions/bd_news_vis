@@ -106,7 +106,7 @@ http://stackoverflow.com/questions/13883277/stanford-parser-and-nltk/34112695#34
 - news_original_tags : `list of Lowercase String` e.g. "bangladesh"
 - news_naive_tags: `list of Lowercase Strings` e.g. \["crime"\]
 - news_ml_tags : `list of Strings` e.g. \["violence", "domestic", "crime"\]
-- news_reporter : `String` e.g. "Captain Bangladesh"
+- news_reporters : `List of Strings` e.g. ["Captain Bangladesh", "Captain America"]
 - news_location: `String` e.g. "Narail" (This is a district name. To keep the district name same we can use the same `districts` list provided below. For dhaka tribune, all the dhaka news and national news are marked as "national", other wise tried to find the location whule crawling using thier tag. Still we have to find and verifiy the locations using NER tagging)
 - news_text: `String` (I am keeping it as an utf text with all the newlines and quotation marks)
 - is_negative : `boolean`
