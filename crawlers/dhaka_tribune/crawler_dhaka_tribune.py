@@ -23,7 +23,7 @@ last_page_number = int(tree_first_page.xpath('//li[@class="pager-last last"]//a/
 ## Parameters of the crawler
 count = 0
 ## I am never taking the 0th page, because those would be the part of the cron jobs of some the next date
-starting_page = 1
+starting_page = 6
 ending_page = last_page_number + 1
 circuit_breaker = False
 
@@ -189,22 +189,26 @@ for current_page in range(starting_page, ending_page):
 					ratio = SequenceMatcher(None, news_location.lower(), district.lower()).ratio()
 					if ratio > 0.75:
 						news_location = district
-					## reason for it to be 0.75 
+					## reason for it to be 0.75 is shown below
 					## ratio = SequenceMatcher(None, "Coxs Bazar", "Cox\xc3\xa2\xc2\x80\xc2\x99s Bazar").ratio() = 0.769
 				print "news_location ", news_location
 		
 		news = tree_news_page.xpath('//div[@class="span6 article-content"]')
- 		if len(news) < 1:
- 			continue
- 		else:
- 			news_html = html.fromstring(tostring(news[0], 'utf-8', method="xml"))
- 			## Some strange unicode characters appear in the news text while crawling, I am removing them
- 			u = u'Â'
- 			u2 = u'â'
- 			# print u
- 			news_text = news_html.text_content().replace(u,"").replace(u2,"")
- 			print "news_text ", news_text
-
+		if len(news) < 1:
+			continue
+		else:
+			news_html = html.fromstring(tostring(news[0], 'utf-8', method="xml"))
+			## Some strange unicode characters appear in the news text while crawling, I am removing them
+			u = u'Â'
+			u2 = u'â'
+			# print u
+			news_text = news_html.text_content().replace(u,"").replace(u2,"")
+			print "news_text ", news_text
+		if news_text and news_text.strip():
+			print "not blank string"
+		else:
+			news_text = ""
+			print "blank string"
 		##?? Could not Download the images, the images can not be opened after download
 		# ## downloading the related image using the news link
 		news_image_link = news_image_links[i]
@@ -227,7 +231,9 @@ for current_page in range(starting_page, ending_page):
 		news_keywords = article.keywords
 		print "Article keywords ", news_keywords
 		article_text = article.text
-		print "article_text ",article_text
+		print "article_text \n",article_text
+		if article_text and article_text.strip():
+			news_text = article_text
 
 		keyword_crime = ["rape","charge","murder","militant","robber","gunfight","blast","torture","bomb","grenade","abduct","suicide","attacked","remand","autopsy","burn","behead","death","explosive","grenade","outlaw","protest","ringleader","body","gut","shibir","mug","jmb","beaten","sexual","harass","infight","yaba","drug","clash","warrant","lynch","held","dowry","confess","housewife","untraced","loot","chase","bullet","eyewitness","terrorist","disappearance","raid","firearm","shootout","suspect","arrest","acid","miscreant","sentenced","stab","altercation","weapon","severed","bust","threat","skirmish","crack"]
 
@@ -258,8 +264,6 @@ for current_page in range(starting_page, ending_page):
 		print "news_given_tag ", news_given_tag
 
 		## Now using Stanford's NER tagger to identify 7 different type of objects in the news article
-		ner_7_class =  create_ner_entities_tuple(news_text)
-		#print ner_7_class
 		news_ner_tags = {}
 		ner_person = []
 		ner_location = []
@@ -268,36 +272,54 @@ for current_page in range(starting_page, ending_page):
 		ner_money = []
 		ner_percent = []
 		ner_time = []
-		for entity in ner_7_class:
-			if entity[1] == "PERSON":
-				ner_person.append(entity[0])
-			elif entity[1] == "LOCATION":
-				ner_location.append(entity[0])
-			elif entity[1] == "ORGANIZATION":
-				ner_organization.append(entity[0])
-			elif entity[1] == "DATE":
-				ner_date.append(entity[0])
-			elif entity[1] == "MONEY":
-				ner_money.append(entity[0])
-			elif entity[1] == "PERCENT":
-				ner_percent.append(entity[0])
-			elif entity[1] == "TIME":
-				ner_time.append(entity[0])
-		news_ner_tags['persons'] = ner_person
-		news_ner_tags['locations'] = ner_location
-		news_ner_tags['organizations'] = ner_organization
-		news_ner_tags['dates'] = ner_date
-		news_ner_tags['moneys'] = ner_money
-		news_ner_tags['percents'] = ner_percent
-		news_ner_tags['times'] = ner_time
+		if not news_text == "":
+			ner_7_class =  create_ner_entities_tuple(news_text)
+			for entity in ner_7_class:
+				if entity[1] == "PERSON":
+					ner_person.append(entity[0])
+				elif entity[1] == "LOCATION":
+					ner_location.append(entity[0])
+				elif entity[1] == "ORGANIZATION":
+					ner_organization.append(entity[0])
+				elif entity[1] == "DATE":
+					ner_date.append(entity[0])
+				elif entity[1] == "MONEY":
+					ner_money.append(entity[0])
+				elif entity[1] == "PERCENT":
+					ner_percent.append(entity[0])
+				elif entity[1] == "TIME":
+					ner_time.append(entity[0])
+			news_ner_tags['persons'] = ner_person
+			news_ner_tags['locations'] = ner_location
+			news_ner_tags['organizations'] = ner_organization
+			news_ner_tags['dates'] = ner_date
+			news_ner_tags['moneys'] = ner_money
+			news_ner_tags['percents'] = ner_percent
+			news_ner_tags['times'] = ner_time
 
-		news_ner_tags['persons_unique'] = list(set(ner_person))
-		news_ner_tags['locations_unique'] = list(set(ner_location))
-		news_ner_tags['organizations_unique'] = list(set(ner_organization))
-		news_ner_tags['dates_unique'] = list(set(ner_date))
-		news_ner_tags['moneys_unique'] = list(set(ner_money))
-		news_ner_tags['percents_unique'] = list(set(ner_percent))
-		news_ner_tags['times_unique'] = list(set(ner_time))
+			news_ner_tags['persons_unique'] = list(set(ner_person))
+			news_ner_tags['locations_unique'] = list(set(ner_location))
+			news_ner_tags['organizations_unique'] = list(set(ner_organization))
+			news_ner_tags['dates_unique'] = list(set(ner_date))
+			news_ner_tags['moneys_unique'] = list(set(ner_money))
+			news_ner_tags['percents_unique'] = list(set(ner_percent))
+			news_ner_tags['times_unique'] = list(set(ner_time))
+		else:
+			news_ner_tags['persons'] = ner_person
+			news_ner_tags['locations'] = ner_location
+			news_ner_tags['organizations'] = ner_organization
+			news_ner_tags['dates'] = ner_date
+			news_ner_tags['moneys'] = ner_money
+			news_ner_tags['percents'] = ner_percent
+			news_ner_tags['times'] = ner_time
+
+			news_ner_tags['persons_unique'] = list(set(ner_person))
+			news_ner_tags['locations_unique'] = list(set(ner_location))
+			news_ner_tags['organizations_unique'] = list(set(ner_organization))
+			news_ner_tags['dates_unique'] = list(set(ner_date))
+			news_ner_tags['moneys_unique'] = list(set(ner_money))
+			news_ner_tags['percents_unique'] = list(set(ner_percent))
+			news_ner_tags['times_unique'] = list(set(ner_time))
 		print news_ner_tags
 		
 		doc = {}
