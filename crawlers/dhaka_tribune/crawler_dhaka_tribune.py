@@ -182,9 +182,12 @@ for current_page in range(starting_page, ending_page):
 				print "news_reporter ", news_reporter
 				print "news_location ", news_location
 			else:
-				news_reporter = news_reporter_location[0].strip()
-				news_location = news_reporter_location[1].strip()
-				print "news_reporter ", news_reporter
+				news_reporter = list()
+				reps = [reporter.strip() for reporter in news_reporter_location[:-1]]
+				for rep in reps:
+					news_reporter.append(rep)
+				news_location = news_reporter_location[-1].strip()
+				print "news_reporters ", news_reporter
 				for district in districts:
 					ratio = SequenceMatcher(None, news_location.lower(), district.lower()).ratio()
 					if ratio > 0.75:
@@ -350,7 +353,9 @@ for current_page in range(starting_page, ending_page):
 		doc["news_original_tags"] = list([news_original_tag])
 		doc["news_naive_tags"] = list([news_given_tag])
 		doc["news_ml_tags"] = None
-		doc["news_reporter"] = news_reporter
+		news_reporters_list = list()
+		news_reporters_list.append(news_reporter)
+		doc["news_reporters"] = news_reporters_list
 		doc["news_location"] = news_location
 		doc["news_text"] = news_text
 		doc["is_negative"] = is_negative
