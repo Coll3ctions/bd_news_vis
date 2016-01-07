@@ -80,16 +80,60 @@ bd_news_vis collaboration
 URL for write up: https://www.sharelatex.com/project/548c9da8f76b211010f38142
 
 ### To run the crawler
-`pip install newspaper pymongo`
 
-Usage of newspaper module of python:
+- Install the required python modules
+```
+pip install newspaper pymongo
+```
+- Go to python and download the nltk corpora using following ocmmands:
+```
+import nltk
+nltk.download()
+d all-corpora
+```
+- Now install the Stanford NER tagger:
+```
+cd $HOME
 
-https://pypi.python.org/pypi/newspaper
+# Update / Install NLTK
+pip install -U nltk
 
-Installing Stanford NER Tagger:
+# Download the Stanford NLP tools
+wget http://nlp.stanford.edu/software/stanford-ner-2015-04-20.zip
+wget http://nlp.stanford.edu/software/stanford-postagger-full-2015-04-20.zip
+wget http://nlp.stanford.edu/software/stanford-parser-full-2015-04-20.zip
+# Extract the zip file.
+unzip stanford-ner-2015-04-20.zip 
+unzip stanford-parser-full-2015-04-20.zip 
+unzip stanford-postagger-full-2015-04-20.zip
+```
+- Copy and add the follwing paths to `.bashrc` file using this command `nano ~/.bashrc`:
+```
+export STANFORDTOOLSDIR=$HOME
 
-http://stackoverflow.com/questions/13883277/stanford-parser-and-nltk/34112695#34112695
+export CLASSPATH=$STANFORDTOOLSDIR/stanford-postagger-full-2015-04-20/stanford-postagger.jar:$STANFORDTOOLSDIR/stanford-ner-2015-04-20/stanford-ner.jar:$STANFORDTOOLSDIR/stanford-parser-full-2015-04-20/stanford-parser.jar:$STANFORDTOOLSDIR/stanford-parser-full-2015-04-20/stanford-parser-3.5.2-models.jar
 
+export STANFORD_MODELS=$STANFORDTOOLSDIR/stanford-postagger-full-2015-04-20/models:$STANFORDTOOLSDIR/stanford-ner-2015-04-20/classifiers
+```
+[Source: Stackoverflow](http://stackoverflow.com/questions/13883277/stanford-parser-and-nltk/34112695#34112695)
+
+- Install Java 8 (oracle-jdk-8)
+```
+java -version
+sudo apt-get install python-software-properties
+sudo add-apt-repository ppa:webupd8team/java
+sudo apt-get update
+sudo apt-get install oracle-java8-installer
+```
+[Source: Digital Ocean](https://www.digitalocean.com/community/tutorials/how-to-install-java-on-ubuntu-with-apt-get)
+- Install mongodb:
+```
+sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv EA312927
+echo "deb http://repo.mongodb.com/apt/ubuntu trusty/mongodb-enterprise/stable multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-enterprise.list
+sudo apt-get update
+sudo apt-get install -y mongodb-enterprise
+```
+[Source: MongoDB](https://docs.mongodb.org/manual/tutorial/install-mongodb-enterprise-on-ubuntu/)
 #### Points to be noted for Stanford NER tagger:
 - Sometimes it confuses one single entity into multiple entities, e.g. "Lt Colonel Shahidur Rahman", "Shahidur Rahman", "Shahidur" are recognized as different entities
 - It mixes up the organizations and persons frequently
