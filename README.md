@@ -88,8 +88,7 @@ pip install newspaper pymongo
 - Go to python and download the nltk corpora using following ocmmands:
 ```
 import nltk
-nltk.download()
-d all-corpora
+nltk.download('punkt')
 ```
 - Now install the Stanford NER tagger:
 ```
