@@ -153,10 +153,10 @@ for current_page in range(starting_page, ending_page):
 		if news_link == "http://www.dhakatribune.com/":
 			continue
 		#### if statement to find if the news article is already in the mongodb database, if it is already there, then the crawler will stop rightaway
-		isDeletedUser = bd_news_articles.find_one({"news_url":news_link})
-		if isDeletedUser:
-			circuit_breaker = True
-			break
+		# isDeletedUser = bd_news_articles.find_one({"news_url":news_link})
+		# if isDeletedUser:
+		# 	circuit_breaker = True
+		# 	break
 		print "news_link ", news_link
 		news_page = requests.get(news_link)
 		news_crawled_date = datetime.datetime.now()
@@ -280,56 +280,24 @@ for current_page in range(starting_page, ending_page):
 		ner_money = []
 		ner_percent = []
 		ner_time = []
-		try:
-			if not news_text == "":
-				ner_7_class =  create_ner_entities_tuple(news_text)
-				for entity in ner_7_class:
-					if entity[1] == "PERSON":
-						ner_person.append(entity[0])
-					elif entity[1] == "LOCATION":
-						ner_location.append(entity[0])
-					elif entity[1] == "ORGANIZATION":
-						ner_organization.append(entity[0])
-					elif entity[1] == "DATE":
-						ner_date.append(entity[0])
-					elif entity[1] == "MONEY":
-						ner_money.append(entity[0])
-					elif entity[1] == "PERCENT":
-						ner_percent.append(entity[0])
-					elif entity[1] == "TIME":
-						ner_time.append(entity[0])
-				news_ner_tags['persons'] = ner_person
-				news_ner_tags['locations'] = ner_location
-				news_ner_tags['organizations'] = ner_organization
-				news_ner_tags['dates'] = ner_date
-				news_ner_tags['moneys'] = ner_money
-				news_ner_tags['percents'] = ner_percent
-				news_ner_tags['times'] = ner_time
-
-				news_ner_tags['persons_unique'] = list(set(ner_person))
-				news_ner_tags['locations_unique'] = list(set(ner_location))
-				news_ner_tags['organizations_unique'] = list(set(ner_organization))
-				news_ner_tags['dates_unique'] = list(set(ner_date))
-				news_ner_tags['moneys_unique'] = list(set(ner_money))
-				news_ner_tags['percents_unique'] = list(set(ner_percent))
-				news_ner_tags['times_unique'] = list(set(ner_time))
-			else:
-				news_ner_tags['persons'] = ner_person
-				news_ner_tags['locations'] = ner_location
-				news_ner_tags['organizations'] = ner_organization
-				news_ner_tags['dates'] = ner_date
-				news_ner_tags['moneys'] = ner_money
-				news_ner_tags['percents'] = ner_percent
-				news_ner_tags['times'] = ner_time
-
-				news_ner_tags['persons_unique'] = list(set(ner_person))
-				news_ner_tags['locations_unique'] = list(set(ner_location))
-				news_ner_tags['organizations_unique'] = list(set(ner_organization))
-				news_ner_tags['dates_unique'] = list(set(ner_date))
-				news_ner_tags['moneys_unique'] = list(set(ner_money))
-				news_ner_tags['percents_unique'] = list(set(ner_percent))
-				news_ner_tags['times_unique'] = list(set(ner_time))
-		except:
+#		try:
+		if not news_text == "":
+			ner_7_class =  create_ner_entities_tuple(news_text)
+			for entity in ner_7_class:
+				if entity[1] == "PERSON":
+					ner_person.append(entity[0])
+				elif entity[1] == "LOCATION":
+					ner_location.append(entity[0])
+				elif entity[1] == "ORGANIZATION":
+					ner_organization.append(entity[0])
+				elif entity[1] == "DATE":
+					ner_date.append(entity[0])
+				elif entity[1] == "MONEY":
+					ner_money.append(entity[0])
+				elif entity[1] == "PERCENT":
+					ner_percent.append(entity[0])
+				elif entity[1] == "TIME":
+					ner_time.append(entity[0])
 			news_ner_tags['persons'] = ner_person
 			news_ner_tags['locations'] = ner_location
 			news_ner_tags['organizations'] = ner_organization
@@ -345,7 +313,39 @@ for current_page in range(starting_page, ending_page):
 			news_ner_tags['moneys_unique'] = list(set(ner_money))
 			news_ner_tags['percents_unique'] = list(set(ner_percent))
 			news_ner_tags['times_unique'] = list(set(ner_time))
-			print "It was an exception for NER tagger"
+		else:
+			news_ner_tags['persons'] = ner_person
+			news_ner_tags['locations'] = ner_location
+			news_ner_tags['organizations'] = ner_organization
+			news_ner_tags['dates'] = ner_date
+			news_ner_tags['moneys'] = ner_money
+			news_ner_tags['percents'] = ner_percent
+			news_ner_tags['times'] = ner_time
+
+			news_ner_tags['persons_unique'] = list(set(ner_person))
+			news_ner_tags['locations_unique'] = list(set(ner_location))
+			news_ner_tags['organizations_unique'] = list(set(ner_organization))
+			news_ner_tags['dates_unique'] = list(set(ner_date))
+			news_ner_tags['moneys_unique'] = list(set(ner_money))
+			news_ner_tags['percents_unique'] = list(set(ner_percent))
+			news_ner_tags['times_unique'] = list(set(ner_time))
+		# except:
+		# 	news_ner_tags['persons'] = ner_person
+		# 	news_ner_tags['locations'] = ner_location
+		# 	news_ner_tags['organizations'] = ner_organization
+		# 	news_ner_tags['dates'] = ner_date
+		# 	news_ner_tags['moneys'] = ner_money
+		# 	news_ner_tags['percents'] = ner_percent
+		# 	news_ner_tags['times'] = ner_time
+
+		# 	news_ner_tags['persons_unique'] = list(set(ner_person))
+		# 	news_ner_tags['locations_unique'] = list(set(ner_location))
+		# 	news_ner_tags['organizations_unique'] = list(set(ner_organization))
+		# 	news_ner_tags['dates_unique'] = list(set(ner_date))
+		# 	news_ner_tags['moneys_unique'] = list(set(ner_money))
+		# 	news_ner_tags['percents_unique'] = list(set(ner_percent))
+		# 	news_ner_tags['times_unique'] = list(set(ner_time))
+		# 	print "It was an exception for NER tagger"
 
 		print news_ner_tags
 		
