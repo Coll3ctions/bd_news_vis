@@ -163,7 +163,15 @@ for current_page in range(starting_page, ending_page):
 		news_date = news_dates[i][2:]
 		news_date = parser.parse(news_date)
 		print "news_date", news_date
-		news_headline = tree_news_page.xpath('//h2[@class="article-title"]/text()')[0].strip()
+		news_headline = tree_news_page.xpath('//h2[@class="article-title"]/text()')
+		if len(news_headline) < 1:
+			time.sleep(1)
+			news_headline = tree_news_page.xpath('//h2[@class="article-title"]/text()')
+			if len(news_headline) < 1:
+				break
+			else:
+				news_headline = news_headline[0].strip()
+		news_headline = news_headline[0].strip()
 		print "news_headline ", news_headline
 		### Remember we are taking all unidentified news as national, but they can be news from Dhaka too
 		news_reporter_location = news_reporters[i]
