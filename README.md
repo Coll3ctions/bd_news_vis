@@ -89,6 +89,7 @@ pip install newspaper pymongo
 ```
 import nltk
 nltk.download('punkt')
+nltk.download('all')
 ```
 - Now install the Stanford NER tagger:
 ```
