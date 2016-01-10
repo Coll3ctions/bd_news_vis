@@ -9,20 +9,20 @@ bd_news_vis collaboration
 - Tamzid (facebook graph api -- internet reach in different districts, interest topics of different people)
 
 ### Todo list
-- daily star crawled text (salman)
+- ~~daily star crawled text (mishuk, salman)~~
   - images to be downloaded
   - tags to be machine learned
-- dhaka tribune crawled text (mishuk)
+- ~~dhaka tribune crawled text (mishuk)~~
   - images to be downloaded
 - prothom alo english version crawled text (mishuk)
-- NER tagging (khalid, script done)
-  - interface with MongoDB 
+- ~~NER tagging (mishuk + khalid)~~
+  - ~~interface with MongoDB~~
 - d3plus visualization (salman, saquib)
-  - improve on existing code from zeeshan
-  - ngram viewer type interface
+  - improve on existing code from zeeshan (kolpokoushol student)
+  - ~~ngram viewer type interface~~
   - network diagrams (show relationship between entities)
-- server space (saquib)
-  - AWS account for server space
+- server space (mishuk + saquib)
+  - ~~AWS account for server space~~
   - for now, mit.edu server. later AWS if needed.
 - Marketing (everyone)
   - prothom alo news
