@@ -172,3 +172,20 @@ A python list of districts:
 ```
 districts = ["Barisal","Bagerhat","Bandarban","Barguna","Bhola","Brahmanbaria","Bogra","Chandpur","Chapainawabganj","Chittagong","Chuadanga","Comilla","Coxs Bazar","Dhaka","Dinajpur","Feni","Faridpur","Gaibandha","Gazipur","Gopalganj","Habiganj","Jessore","Jhalokati","Jamalpur","Joypurhat","Jhenaidah","Kurigram","Khulna","Khagrachhari","Kushtia","Kishoreganj","Lakshmipur","Lalmonirhat","Madaripur","Magura","Meherpur","Moulvibazar","Mymensingh","Manikganj","Munshiganj","Narail","Narayanganj","Noakhali","Naogaon","Narsingdi","Natore","Netrokona","Nilphamari","Pabna","Panchagarh","Patuakhali","Pirojpur","Rajshahi","Rajbari","Rangamati","Rangpur","Sylhet","Shariatpur","Satkhira","Sherpur","Sirajganj","Sunamgonj","Tangail","Thakurgaon"]
 ```
+### Installing Elasticsearch and Kibana
+
+#### Mac:
+Use this [tutorial](https://gist.github.com/squarism/8fa9cdd7d6b36c9fcb45) to install Elasticsearch and Kibana and Nginx in Mac. You do not need to install logstash.
+
+####Ubuntu:
+Use this [tutorial](https://www.digitalocean.com/community/tutorials/how-to-install-elasticsearch-logstash-and-kibana-elk-stack-on-ubuntu-14-04) to install Elasticearch, Kibana and Nginx. Again, we do not need logstash.
+
+#### To check if the database is up and running:
+```
+curl -X GET 'http://localhost:9200'
+```
+
+#### To check the available databases and their size:
+```
+curl 'localhost:9200/_cat/indices?v'
+```
