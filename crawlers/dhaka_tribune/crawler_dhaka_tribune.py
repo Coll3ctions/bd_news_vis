@@ -297,7 +297,7 @@ for current_page in range(starting_page, ending_page):
 				elif any(x in news_text for x in keyword_crime):
 					news_given_tag = 'crime'
 				else:
-					news_given_tag = 'postive'
+					news_given_tag = 'positive'
 					is_negative = False
 			elif any(x in news_text for x in keyword_accident):
 				news_given_tag = 'accident'
