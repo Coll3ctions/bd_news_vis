@@ -246,6 +246,8 @@ for current_page in range(starting_page, ending_page):
 		##?? Could not Download the images, the images can not be opened after download
 		# ## downloading the related image using the news link
 		news_image_link = news_image_links[i]
+		news_image_link = "http://www.dhakatribune.com"+news_image_link
+		print "news_image_link ", news_image_link
 		# news_image_link = "http://www.dhakatribune.com"+news_image_link
 		# news_image_filename = news_date.strftime('%Y-%m-%d')+news_headline.replace(" ","-")+".jpg"
 		# news_image_filename.replace(",","")
