@@ -6,6 +6,7 @@ bd_news_vis collaboration
 - Mehrab (analysis, data collection from other sources (weather shocks, climate, policies in heath and education))
 - Mishuk (back-end, analysis)
 - Salman (web front end and back end, ngram viewer)
+- Tamzid (facebook graph api -- internet reach in different districts, interest topics of different people)
 
 ### Todo list
 - daily star crawled text (salman)
@@ -32,7 +33,7 @@ bd_news_vis collaboration
 
 ### Issues (add more to keep track)
 - ~~xpath parsing not returning 0 or null results (mishuk)~~
-- scrapy crawling not working with xpath (salman)
+- ~~scrapy crawling not working with xpath (salman)~~
 - d3plus map not showing full region (saquib)
 
 ### Data analysis methods (ideas)
@@ -70,6 +71,11 @@ bd_news_vis collaboration
 - investment opportunities based on location based news
 - news trend and correlation with economic growth
 - sentiment analysis and news mention can be analyzed to see if they have correlation with economic metrics.
+
+### further further ideas
+- surface temperature, rainfall viz for district wise.
+- blog topics
+- facebook feeds (graph api)
 
 ### Possible Journals: 
 - AEP
