@@ -14,6 +14,7 @@ from nltk.chunk import conlltags2tree
 from nltk.tree import Tree
 from newspaper import Article
 import datetime
+from elasticsearch import Elasticsearch
 
 ## Getting the total number of pages in the pagination form the first page using the last page number in the pagination
 first_page = requests.get('http://www.dhakatribune.com/bangladesh')
@@ -52,6 +53,9 @@ def download_photo(img_url, filename):
 client = MongoClient("mongodb://localhost:27017/")
 db = client.bd_news
 bd_news_articles = db.bd_news_articles
+
+## Load Elasticsearch
+es = Elasticsearch()
 
 ## Setting up Stanfor NER Tagger 
 ## using these instructions: http://stackoverflow.com/questions/13883277/stanford-parser-and-nltk/34112695#34112695
@@ -219,13 +223,15 @@ for current_page in range(starting_page, ending_page):
 					news_reporter.append(rep)
 				news_location = news_reporter_location[-1].strip()
 				print "news_reporters ", news_reporter
+				ratios = list()
 				for district in districts:
 					ratio = SequenceMatcher(None, news_location.lower(), district.lower()).ratio()
-					if ratio > 0.75:
-						news_location = district
-					## reason for it to be 0.75 is shown below
-					## ratio = SequenceMatcher(None, "Coxs Bazar", "Cox\xc3\xa2\xc2\x80\xc2\x99s Bazar").ratio() = 0.769
-				print "news_location ", news_location
+					ratios.append(ratio)
+				## Now taking the higest matching score as some locations are stored as "back from dinajpur"
+				district_index = ratios.index(max(ratios))
+				news_location = districts[district_index]
+
+		print "news_location ", news_location
 		
 		news = tree_news_page.xpath('//div[@class="span6 article-content"]')
 		if len(news) < 1:
@@ -237,12 +243,12 @@ for current_page in range(starting_page, ending_page):
 			u2 = u'â'
 			# print u
 			news_text = news_html.text_content().replace(u,"").replace(u2,"")
-			print "news_text ", news_text
 		if news_text and news_text.strip():
 			print "not blank string"
 		else:
 			news_text = ""
 			print "blank string"
+		#print "news_text ", news_text
 		##?? Could not Download the images, the images can not be opened after download
 		# ## downloading the related image using the news link
 		news_image_link = news_image_links[i]
@@ -272,7 +278,7 @@ for current_page in range(starting_page, ending_page):
 			article_text = ""
 			news_keywords = []
 			print "newspaper.Article Exception"
-		print "article_text \n",article_text
+		#print "article_text \n",article_text
 		if article_text and article_text.strip():
 			news_text = article_text
 
@@ -404,8 +410,15 @@ for current_page in range(starting_page, ending_page):
 		doc["news_crawled_date"] = news_crawled_date
 		doc["news_keywords"] = news_keywords
 		doc["news_ner_tags"] = news_ner_tags
+		
+		## Inserting into elasticsearch storage
+		res = es.index(index="bd_news", doc_type='article', body=doc)
+		print(res['created'])
+
+		## Inserting into mongodb
 		current_mongo_insert_id = bd_news_articles.insert_one(doc).inserted_id
 		print "inserted ", news_link, " as ", current_mongo_insert_id
+
 		count += 1
 		print "Current page ", current_page
 		print "total news inserted ", count
