@@ -163,6 +163,29 @@ for current_page in range(starting_page, ending_page):
 		news_date = news_dates[i][2:]
 		news_date = parser.parse(news_date)
 		print "news_date", news_date
+		# >> published: 15:51 april 9, 2013 >> updated : 16:11 april 9, 2013
+		news_date_time = tree_news_page.xpath('//span[@class="submitted date"]/text()')
+		#print "uncleaned news_date_time ",news_date_time
+		if len(news_date_time)>1:
+			#print "first if"
+			news_date_time = news_date_time[1]
+			news_date_time = news_date_time.split(">>")
+			try:
+				if len(news_date_time) > 0:
+					#print "news_date_time inseide second if ", news_date_time
+					if len(news_date_time) > 1:
+						news_date_time = news_date_time[1]
+					else:
+						news_date_time = news_date_time[0]
+					news_date_time = news_date_time.strip().replace("published:","")
+					news_date_time = parser.parse(news_date_time)
+					print "news_date_time ",news_date_time
+				else:
+					news_date_time = news_date
+			except:
+				news_date_time = news_date
+		else:
+			news_date_time = news_date
 		news_headline = tree_news_page.xpath('//h2[@class="article-title"]/text()')
 		if len(news_headline) < 1:
 			time.sleep(1)
@@ -360,7 +383,7 @@ for current_page in range(starting_page, ending_page):
 		doc["newspaper_name"] = newspaper_name
 		doc["newspaper_url"] = newspaper_url
 		doc["news_headline"] = news_headline
-		doc["news_publish_date"] = news_date
+		doc["news_publish_date"] = news_date_time
 		doc["news_url"] = news_link
 		doc["news_original_tags"] = list([news_original_tag])
 		doc["news_naive_tags"] = list([news_given_tag])
