@@ -1,0 +1,88 @@
+curl -XPUT http://localhost:9200/bd_news -d '{
+ "mappings" : {
+    "article" : {
+        "properties" : {
+            "newspaper_name" : {"type": "string", "index" : "not_analyzed" },
+            "newspaper_url" : {"type": "string", "index" : "not_analyzed" },
+            "news_headline" : {"type": "string", "index" : "analyzed" },
+            "news_publish_date" : { "type" : "date" },
+            "news_url" : {"type": "string", "index" : "not_analyzed" },
+            "news_original_tags" : {"type": "string", "index" : "not_analyzed"},
+            "news_naive_tags":{"type":"string","index" : "not_analyzed"},
+            "news_ml_tags":{"type":"string","index" : "not_analyzed"},
+            "news_reporters" : {"type": "string", "index" : "not_analyzed" },
+            "news_location" : {"type": "string", "index" : "not_analyzed" },
+            "news_text" : {"type": "string", "index" : "analyzed" },
+            "is_negative" : {"type": "boolean"},
+            "news_image_urls" : {"type": "string", "index" : "not_analyzed" },
+            "news_crawled_date" : { "type" : "date" },
+            "news_keywords" : {"type": "string", "index" : "not_analyzed"},
+            "news_ner_tags" : {
+              "properties":{
+                "persons":{"type":"string","index":"not_analyzed"},
+                "locations":{"type":"string","index":"not_analyzed"},
+                "organizations":{"type":"string","index":"not_analyzed"},
+                "dates":{"type":"string","index":"not_analyzed"},
+                "moneys":{"type":"string","index":"not_analyzed"},
+                "percents":{"type":"string","index":"not_analyzed"},
+                "times":{"type":"string","index":"not_analyzed"},
+                "persons_unique":{"type":"string","index":"not_analyzed"},
+                "locations_unique":{"type":"string","index":"not_analyzed"},
+                "organizations_unique":{"type":"string","index":"not_analyzed"},
+                "dates_unique":{"type":"string","index":"not_analyzed"},
+                "moneys_unique":{"type":"string","index":"not_analyzed"},
+                "percents_unique":{"type":"string","index":"not_analyzed"},
+                "times_unique":{"type":"string","index":"not_analyzed"}
+              }
+            }
+     }
+    }
+ }}';
+
+curl -XPUT http://localhost:9200/bd_news -d '{
+ "mappings" : {
+    "article" : {
+        "properties" : {
+            "newspaper_name" : {"type": "string", "index" : "not_analyzed" },
+            "newspaper_url" : {"type": "string", "index" : "not_analyzed" },
+            "news_headline" : {"type": "string", "index" : "analyzed" },
+            "news_publish_date" : { "type" : "date" },
+            "news_url" : {"type": "string", "index" : "not_analyzed" },
+            "news_original_tags" : {"type": "string", "index" : "not_analyzed"},
+            "news_naive_tags":{"type":"string","index" : "not_analyzed"},
+            "news_ml_tags":{"type":"string","index" : "not_analyzed"},
+            "news_reporters" : {"type": "string", "index" : "not_analyzed" },
+            "news_location" : {"type": "string", "index" : "not_analyzed" },
+            "news_text" : {"type": "string", "index" : "analyzed" },
+            "is_negative" : {"type": "boolean"},
+            "news_image_urls" : {"type": "string", "index" : "not_analyzed" },
+            "news_crawled_date" : { "type" : "date" },
+            "news_keywords" : {"type": "string", "index" : "not_analyzed"}
+     }
+    }
+ }
+}';
+
+
+To see if elastic search is working or not:
+curl -X GET 'http://localhost:9200'
+
+To see all the indices:
+curl 'localhost:9200/_cat/indices?v'
+
+Deleting whole database:
+curl -XDELETE 'http://localhost:9200/bd_news/'
+
+
+cd /usr/local/var/www/
+
+
+ Install kibana and elasticsearch using this link:
+ https://www.digitalocean.com/community/tutorials/how-to-install-elasticsearch-logstash-and-kibana-elk-stack-on-ubuntu-14-04
+
+ caveat: Install the latest version of kibana e.g. 2.1.1
+
+
+ Issues:
+ Some ner_tags are maybe empty
+ timezone is converted by elastic search
