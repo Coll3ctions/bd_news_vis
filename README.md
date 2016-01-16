@@ -89,8 +89,10 @@ URL for write up: https://www.sharelatex.com/project/548c9da8f76b211010f38142
 
 - Install the required python modules
 ```
-pip install newspaper pymongo
+pip install newspaper pymongo elasticsearch
 ```
+You may get an error in Mac while installing `newspaper`. You can avoid it by install these modules `brew install libtiff libjpeg webp little-cms2`.
+
 - Go to python and download the nltk corpora using following ocmmands:
 ```
 import nltk
