@@ -149,227 +149,194 @@ for current_page in range(starting_page, ending_page):
 
 	## Now crawling through each individual news article of a distinct paginatated top lavel pages
 	for i in range(len(news_links)):
-		try:
-			print
-			print
-			print "current page ", current_page
-			print "position of this news ", i+1
-			news_link = news_links[i]
-			if news_link == "http://www.dhakatribune.com/":
-				continue
-			#### if statement to find if the news article is already in the mongodb database, if it is already there, then the crawler will stop rightaway
-			# isDeletedUser = bd_news_articles.find_one({"news_url":news_link})
-			# if isDeletedUser:
-			# 	circuit_breaker = True
-			# 	break
-			print "news_link ", news_link
-			news_page = requests.get(news_link)
-			news_crawled_date = datetime.datetime.now()
-			tree_news_page = html.fromstring(news_page.content)
-			news_date = news_dates[i][2:]
-			news_date = parser.parse(news_date)
-			print "news_date", news_date
-			# >> published: 15:51 april 9, 2013 >> updated : 16:11 april 9, 2013
-			news_date_time = tree_news_page.xpath('//span[@class="submitted date"]/text()')
-			#print "uncleaned news_date_time ",news_date_time
-			if len(news_date_time)>1:
-				#print "first if"
-				news_date_time = news_date_time[1]
-				news_date_time = news_date_time.split(">>")
-				try:
-					if len(news_date_time) > 0:
-						#print "news_date_time inseide second if ", news_date_time
-						if len(news_date_time) > 1:
-							news_date_time = news_date_time[1]
-						else:
-							news_date_time = news_date_time[0]
-						news_date_time = news_date_time.strip().replace("published:","")
-						news_date_time = parser.parse(news_date_time)
-						print "news_date_time ",news_date_time
+		print
+		print
+		print "current page ", current_page
+		print "position of this news ", i+1
+		news_link = news_links[i]
+		if news_link == "http://www.dhakatribune.com/":
+			continue
+		#### if statement to find if the news article is already in the mongodb database, if it is already there, then the crawler will stop rightaway
+		# isDeletedUser = bd_news_articles.find_one({"news_url":news_link})
+		# if isDeletedUser:
+		# 	circuit_breaker = True
+		# 	break
+		print "news_link ", news_link
+		news_page = requests.get(news_link)
+		news_crawled_date = datetime.datetime.now()
+		tree_news_page = html.fromstring(news_page.content)
+		news_date = news_dates[i][2:]
+		news_date = parser.parse(news_date)
+		print "news_date", news_date
+		# >> published: 15:51 april 9, 2013 >> updated : 16:11 april 9, 2013
+		news_date_time = tree_news_page.xpath('//span[@class="submitted date"]/text()')
+		#print "uncleaned news_date_time ",news_date_time
+		if len(news_date_time)>1:
+			#print "first if"
+			news_date_time = news_date_time[1]
+			news_date_time = news_date_time.split(">>")
+			try:
+				if len(news_date_time) > 0:
+					#print "news_date_time inseide second if ", news_date_time
+					if len(news_date_time) > 1:
+						news_date_time = news_date_time[1]
 					else:
-						news_date_time = news_date
-				except:
+						news_date_time = news_date_time[0]
+					news_date_time = news_date_time.strip().replace("published:","")
+					news_date_time = parser.parse(news_date_time)
+					print "news_date_time ",news_date_time
+				else:
 					news_date_time = news_date
-			else:
+			except:
 				news_date_time = news_date
+		else:
+			news_date_time = news_date
+		news_headline = tree_news_page.xpath('//h2[@class="article-title"]/text()')
+		if len(news_headline) < 1:
+			time.sleep(1)
 			news_headline = tree_news_page.xpath('//h2[@class="article-title"]/text()')
 			if len(news_headline) < 1:
-				time.sleep(1)
-				news_headline = tree_news_page.xpath('//h2[@class="article-title"]/text()')
-				if len(news_headline) < 1:
-					break
-				else:
-					news_headline = news_headline[0].strip()
-			news_headline = news_headline[0].strip()
-			print "news_headline ", news_headline
-			### Remember we are taking all unidentified news as national, but they can be news from Dhaka too
-			news_reporter_location = news_reporters[i]
-			print "news_reporter_location ", news_reporter_location
-			if news_reporter_location == "":
-				news_reporter = ""
+				break
+			else:
+				news_headline = news_headline[0].strip()
+		news_headline = news_headline[0].strip()
+		print "news_headline ", news_headline
+		### Remember we are taking all unidentified news as national, but they can be news from Dhaka too
+		news_reporter_location = news_reporters[i]
+		print "news_reporter_location ", news_reporter_location
+		if news_reporter_location == "":
+			news_reporter = ""
+			news_location = "National"
+			print "news_reporter ", news_reporter
+			print "news_location ", news_location
+		else:
+			news_reporter_location = news_reporter_location.split(',')
+			if len(news_reporter_location) < 2:
+				news_reporter = news_reporter_location[0].strip()
 				news_location = "National"
 				print "news_reporter ", news_reporter
 				print "news_location ", news_location
 			else:
-				news_reporter_location = news_reporter_location.split(',')
-				if len(news_reporter_location) < 2:
-					news_reporter = news_reporter_location[0].strip()
-					news_location = "National"
-					print "news_reporter ", news_reporter
-					print "news_location ", news_location
-				else:
-					news_reporter = list()
-					reps = [reporter.strip() for reporter in news_reporter_location[:-1]]
-					for rep in reps:
-						news_reporter.append(rep)
-					news_location = news_reporter_location[-1].strip()
-					print "news_reporters ", news_reporter
-					ratios = list()
-					for district in districts:
-						ratio = SequenceMatcher(None, news_location.lower(), district.lower()).ratio()
-						ratios.append(ratio)
-					## Now taking the higest matching score as some locations are stored as "back from dinajpur"
-					district_index = ratios.index(max(ratios))
-					news_location = districts[district_index]
+				news_reporter = list()
+				reps = [reporter.strip() for reporter in news_reporter_location[:-1]]
+				for rep in reps:
+					news_reporter.append(rep)
+				news_location = news_reporter_location[-1].strip()
+				print "news_reporters ", news_reporter
+				ratios = list()
+				for district in districts:
+					ratio = SequenceMatcher(None, news_location.lower(), district.lower()).ratio()
+					ratios.append(ratio)
+				## Now taking the higest matching score as some locations are stored as "back from dinajpur"
+				district_index = ratios.index(max(ratios))
+				news_location = districts[district_index]
 
-			print "news_location ", news_location
-			
-			news = tree_news_page.xpath('//div[@class="span6 article-content"]')
-			if len(news) < 1:
-				continue
-			else:
-				news_html = html.fromstring(tostring(news[0], 'utf-8', method="xml"))
-				## Some strange unicode characters appear in the news text while crawling, I am removing them
-				u = u'Â'
-				u2 = u'â'
-				# print u
-				news_text = news_html.text_content().replace(u,"").replace(u2,"")
-			if news_text and news_text.strip():
-				print "not blank string"
-			else:
-				news_text = ""
-				print "blank string"
-			#print "news_text ", news_text
-			##?? Could not Download the images, the images can not be opened after download
-			# ## downloading the related image using the news link
-			news_image_link = news_image_links[i]
-			news_image_link = "http://www.dhakatribune.com"+news_image_link
-			print "news_image_link ", news_image_link
-			# news_image_link = "http://www.dhakatribune.com"+news_image_link
-			# news_image_filename = news_date.strftime('%Y-%m-%d')+news_headline.replace(" ","-")+".jpg"
-			# news_image_filename.replace(",","")
-			# download_photo(news_image_link,news_image_filename)
-			# #urllib.urlretrieve(news_image_link, "dhaka_tribune_images/"+news_image_filename)
+		print "news_location ", news_location
+		
+		news = tree_news_page.xpath('//div[@class="span6 article-content"]')
+		if len(news) < 1:
+			continue
+		else:
+			news_html = html.fromstring(tostring(news[0], 'utf-8', method="xml"))
+			## Some strange unicode characters appear in the news text while crawling, I am removing them
+			u = u'Â'
+			u2 = u'â'
+			# print u
+			news_text = news_html.text_content().replace(u,"").replace(u2,"")
+		if news_text and news_text.strip():
+			print "not blank string"
+		else:
+			news_text = ""
+			print "blank string"
+		#print "news_text ", news_text
+		##?? Could not Download the images, the images can not be opened after download
+		# ## downloading the related image using the news link
+		news_image_link = news_image_links[i]
+		news_image_link = "http://www.dhakatribune.com"+news_image_link
+		print "news_image_link ", news_image_link
+		# news_image_link = "http://www.dhakatribune.com"+news_image_link
+		# news_image_filename = news_date.strftime('%Y-%m-%d')+news_headline.replace(" ","-")+".jpg"
+		# news_image_filename.replace(",","")
+		# download_photo(news_image_link,news_image_filename)
+		# #urllib.urlretrieve(news_image_link, "dhaka_tribune_images/"+news_image_filename)
 
-			## Initially all of them are null, we will assign this using machine learning
-			news_original_tag = news_orignal_tags[i].lower()
-			## is_negative inititated as true, when we can not find any negative keyword then it will be changed into false
-			is_negative = True
-			
-			## Using python's newspaper module to extract the news text and some very basic keywords
-			try:
-				article = Article(news_link)
-				article.download()
-				article.parse()
-				article.nlp()
-				news_keywords = article.keywords
-				print "Article keywords ", news_keywords
-				article_text = article.text
-			except:
-				article_text = ""
-				news_keywords = []
-				print "newspaper.Article Exception"
-			#print "article_text \n",article_text
-			if article_text and article_text.strip():
-				news_text = article_text
+		## Initially all of them are null, we will assign this using machine learning
+		news_original_tag = news_orignal_tags[i].lower()
+		## is_negative inititated as true, when we can not find any negative keyword then it will be changed into false
+		is_negative = True
+		
+		## Using python's newspaper module to extract the news text and some very basic keywords
+		try:
+			article = Article(news_link)
+			article.download()
+			article.parse()
+			article.nlp()
+			news_keywords = article.keywords
+			print "Article keywords ", news_keywords
+			article_text = article.text
+		except:
+			article_text = ""
+			news_keywords = []
+			print "newspaper.Article Exception"
+		#print "article_text \n",article_text
+		if article_text and article_text.strip():
+			news_text = article_text
 
-			keyword_crime = ["rape","charge","murder","militant","robber","gunfight","blast","torture","bomb","grenade","abduct","suicide","attacked","remand","autopsy","burn","behead","death","explosive","grenade","outlaw","protest","ringleader","body","gut","shibir","mug","jmb","beaten","sexual","harass","infight","yaba","drug","clash","warrant","lynch","held","dowry","confess","housewife","untraced","loot","chase","bullet","eyewitness","terrorist","disappearance","raid","firearm","shootout","suspect","arrest","acid","miscreant","sentenced","stab","altercation","weapon","severed","bust","threat","skirmish","crack"]
+		keyword_crime = ["rape","charge","murder","militant","robber","gunfight","blast","torture","bomb","grenade","abduct","suicide","attacked","remand","autopsy","burn","behead","death","explosive","grenade","outlaw","protest","ringleader","body","gut","shibir","mug","jmb","beaten","sexual","harass","infight","yaba","drug","clash","warrant","lynch","held","dowry","confess","housewife","untraced","loot","chase","bullet","eyewitness","terrorist","disappearance","raid","firearm","shootout","suspect","arrest","acid","miscreant","sentenced","stab","altercation","weapon","severed","bust","threat","skirmish","crack"]
 
-			keyword_common_accident_crime = ["fire","injur","body","deceased","explod","kill"]
+		keyword_common_accident_crime = ["fire","injur","body","deceased","explod","kill"]
 
-			keyword_accident=["electrocut","ram","colli","crash","accident","collapse","douse","plunge","drown","cylinder","crush","engulf","capsize","derail"]
+		keyword_accident=["electrocut","ram","colli","crash","accident","collapse","douse","plunge","drown","cylinder","crush","engulf","capsize","derail"]
 
-			if news_original_tag.lower() == "crime":
-				news_given_tag = news_original_tag.lower()
-			else:
-				if any(x in news_text for x in keyword_common_accident_crime):
-					if any(x in news_text for x in keyword_accident):
-						news_given_tag = 'accident'
-					elif any(x in news_text for x in keyword_crime):
-						news_given_tag = 'crime'
-					else:
-						news_given_tag = 'positive'
-						is_negative = False
-				elif any(x in news_text for x in keyword_accident):
+		if news_original_tag.lower() == "crime":
+			news_given_tag = news_original_tag.lower()
+		else:
+			if any(x in news_text for x in keyword_common_accident_crime):
+				if any(x in news_text for x in keyword_accident):
 					news_given_tag = 'accident'
 				elif any(x in news_text for x in keyword_crime):
 					news_given_tag = 'crime'
 				else:
 					news_given_tag = 'positive'
 					is_negative = False
-			print "news_original_tag ", news_original_tag
-			print "is_negative ",is_negative
-			print "news_given_tag ", news_given_tag
+			elif any(x in news_text for x in keyword_accident):
+				news_given_tag = 'accident'
+			elif any(x in news_text for x in keyword_crime):
+				news_given_tag = 'crime'
+			else:
+				news_given_tag = 'positive'
+				is_negative = False
+		print "news_original_tag ", news_original_tag
+		print "is_negative ",is_negative
+		print "news_given_tag ", news_given_tag
 
-			## Now using Stanford's NER tagger to identify 7 different type of objects in the news article
-			news_ner_tags = {}
-			ner_person = []
-			ner_location = []
-			ner_organization = []
-			ner_date = []
-			ner_money = []
-			ner_percent = []
-			ner_time = []
-			try:
-				if not news_text == "":
-					ner_7_class =  create_ner_entities_tuple(news_text)
-					for entity in ner_7_class:
-						if entity[1] == "PERSON":
-							ner_person.append(entity[0])
-						elif entity[1] == "LOCATION":
-							ner_location.append(entity[0])
-						elif entity[1] == "ORGANIZATION":
-							ner_organization.append(entity[0])
-						elif entity[1] == "DATE":
-							ner_date.append(entity[0])
-						elif entity[1] == "MONEY":
-							ner_money.append(entity[0])
-						elif entity[1] == "PERCENT":
-							ner_percent.append(entity[0])
-						elif entity[1] == "TIME":
-							ner_time.append(entity[0])
-					news_ner_tags['persons'] = ner_person
-					news_ner_tags['locations'] = ner_location
-					news_ner_tags['organizations'] = ner_organization
-					news_ner_tags['dates'] = ner_date
-					news_ner_tags['moneys'] = ner_money
-					news_ner_tags['percents'] = ner_percent
-					news_ner_tags['times'] = ner_time
-
-					news_ner_tags['persons_unique'] = list(set(ner_person))
-					news_ner_tags['locations_unique'] = list(set(ner_location))
-					news_ner_tags['organizations_unique'] = list(set(ner_organization))
-					news_ner_tags['dates_unique'] = list(set(ner_date))
-					news_ner_tags['moneys_unique'] = list(set(ner_money))
-					news_ner_tags['percents_unique'] = list(set(ner_percent))
-					news_ner_tags['times_unique'] = list(set(ner_time))
-				else:
-					news_ner_tags['persons'] = ner_person
-					news_ner_tags['locations'] = ner_location
-					news_ner_tags['organizations'] = ner_organization
-					news_ner_tags['dates'] = ner_date
-					news_ner_tags['moneys'] = ner_money
-					news_ner_tags['percents'] = ner_percent
-					news_ner_tags['times'] = ner_time
-
-					news_ner_tags['persons_unique'] = list(set(ner_person))
-					news_ner_tags['locations_unique'] = list(set(ner_location))
-					news_ner_tags['organizations_unique'] = list(set(ner_organization))
-					news_ner_tags['dates_unique'] = list(set(ner_date))
-					news_ner_tags['moneys_unique'] = list(set(ner_money))
-					news_ner_tags['percents_unique'] = list(set(ner_percent))
-					news_ner_tags['times_unique'] = list(set(ner_time))
-			except:
+		## Now using Stanford's NER tagger to identify 7 different type of objects in the news article
+		news_ner_tags = {}
+		ner_person = []
+		ner_location = []
+		ner_organization = []
+		ner_date = []
+		ner_money = []
+		ner_percent = []
+		ner_time = []
+		try:
+			if not news_text == "":
+				ner_7_class =  create_ner_entities_tuple(news_text)
+				for entity in ner_7_class:
+					if entity[1] == "PERSON":
+						ner_person.append(entity[0])
+					elif entity[1] == "LOCATION":
+						ner_location.append(entity[0])
+					elif entity[1] == "ORGANIZATION":
+						ner_organization.append(entity[0])
+					elif entity[1] == "DATE":
+						ner_date.append(entity[0])
+					elif entity[1] == "MONEY":
+						ner_money.append(entity[0])
+					elif entity[1] == "PERCENT":
+						ner_percent.append(entity[0])
+					elif entity[1] == "TIME":
+						ner_time.append(entity[0])
 				news_ner_tags['persons'] = ner_person
 				news_ner_tags['locations'] = ner_location
 				news_ner_tags['organizations'] = ner_organization
@@ -385,47 +352,77 @@ for current_page in range(starting_page, ending_page):
 				news_ner_tags['moneys_unique'] = list(set(ner_money))
 				news_ner_tags['percents_unique'] = list(set(ner_percent))
 				news_ner_tags['times_unique'] = list(set(ner_time))
-				print "It was an exception for NER tagger"
+			else:
+				news_ner_tags['persons'] = ner_person
+				news_ner_tags['locations'] = ner_location
+				news_ner_tags['organizations'] = ner_organization
+				news_ner_tags['dates'] = ner_date
+				news_ner_tags['moneys'] = ner_money
+				news_ner_tags['percents'] = ner_percent
+				news_ner_tags['times'] = ner_time
 
-			print news_ner_tags
-			
-			doc = {}
-			doc["newspaper_name"] = newspaper_name
-			doc["newspaper_url"] = newspaper_url
-			doc["news_headline"] = news_headline
-			doc["news_publish_date"] = news_date_time
-			doc["news_url"] = news_link
-			doc["news_original_tags"] = list([news_original_tag])
-			doc["news_naive_tags"] = list([news_given_tag])
-			doc["news_ml_tags"] = None
-			news_reporters_list = list()
-			news_reporters_list.append(news_reporter)
-			doc["news_reporters"] = news_reporters_list
-			doc["news_location"] = news_location
-			doc["news_text"] = news_text
-			doc["is_negative"] = is_negative
-			##?? Could not manage to download the images properly
-			## Keeping the news image link an array as there can be multiple images in a news in future
-			doc["news_image_urls"] = list([news_image_link])
-			#doc["news_image_filename"] = news_image_filename
-			doc["news_crawled_date"] = news_crawled_date
-			doc["news_keywords"] = news_keywords
-			doc["news_ner_tags"] = news_ner_tags
-			
-			## Inserting into elasticsearch storage
-			res = es.index(index="bd_news", doc_type='article', body=doc)
-			print(res['created'])
-
-			## Inserting into mongodb
-			current_mongo_insert_id = bd_news_articles.insert_one(doc).inserted_id
-			print "inserted ", news_link, " as ", current_mongo_insert_id
-
-			count += 1
-			print "Current page ", current_page
-			print "total news inserted ", count
-			#time.sleep(1)
+				news_ner_tags['persons_unique'] = list(set(ner_person))
+				news_ner_tags['locations_unique'] = list(set(ner_location))
+				news_ner_tags['organizations_unique'] = list(set(ner_organization))
+				news_ner_tags['dates_unique'] = list(set(ner_date))
+				news_ner_tags['moneys_unique'] = list(set(ner_money))
+				news_ner_tags['percents_unique'] = list(set(ner_percent))
+				news_ner_tags['times_unique'] = list(set(ner_time))
 		except:
-			continue
+			news_ner_tags['persons'] = ner_person
+			news_ner_tags['locations'] = ner_location
+			news_ner_tags['organizations'] = ner_organization
+			news_ner_tags['dates'] = ner_date
+			news_ner_tags['moneys'] = ner_money
+			news_ner_tags['percents'] = ner_percent
+			news_ner_tags['times'] = ner_time
+
+			news_ner_tags['persons_unique'] = list(set(ner_person))
+			news_ner_tags['locations_unique'] = list(set(ner_location))
+			news_ner_tags['organizations_unique'] = list(set(ner_organization))
+			news_ner_tags['dates_unique'] = list(set(ner_date))
+			news_ner_tags['moneys_unique'] = list(set(ner_money))
+			news_ner_tags['percents_unique'] = list(set(ner_percent))
+			news_ner_tags['times_unique'] = list(set(ner_time))
+			print "It was an exception for NER tagger"
+
+		print news_ner_tags
+		
+		doc = {}
+		doc["newspaper_name"] = newspaper_name
+		doc["newspaper_url"] = newspaper_url
+		doc["news_headline"] = news_headline
+		doc["news_publish_date"] = news_date_time
+		doc["news_url"] = news_link
+		doc["news_original_tags"] = list([news_original_tag])
+		doc["news_naive_tags"] = list([news_given_tag])
+		doc["news_ml_tags"] = None
+		news_reporters_list = list()
+		news_reporters_list.append(news_reporter)
+		doc["news_reporters"] = news_reporters_list
+		doc["news_location"] = news_location
+		doc["news_text"] = news_text
+		doc["is_negative"] = is_negative
+		##?? Could not manage to download the images properly
+		## Keeping the news image link an array as there can be multiple images in a news in future
+		doc["news_image_urls"] = list([news_image_link])
+		#doc["news_image_filename"] = news_image_filename
+		doc["news_crawled_date"] = news_crawled_date
+		doc["news_keywords"] = news_keywords
+		doc["news_ner_tags"] = news_ner_tags
+		
+		## Inserting into elasticsearch storage
+		res = es.index(index="bd_news", doc_type='article', body=doc)
+		print(res['created'])
+
+		## Inserting into mongodb
+		current_mongo_insert_id = bd_news_articles.insert_one(doc).inserted_id
+		print "inserted ", news_link, " as ", current_mongo_insert_id
+
+		count += 1
+		print "Current page ", current_page
+		print "total news inserted ", count
+		#time.sleep(1)
 	if circuit_breaker == True:
 		break
 
