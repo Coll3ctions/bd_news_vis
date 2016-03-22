@@ -191,3 +191,11 @@ curl -X GET 'http://localhost:9200'
 ```
 curl 'localhost:9200/_cat/indices?v'
 ```
+
+#### Running Kibana
+```
+cd /path/to/kibana
+cd bin
+./kibana
+```
+[Source](http://codingexplained.com/operating-systems/mac/installing-kibana-for-elasticsearch-on-os-x)
